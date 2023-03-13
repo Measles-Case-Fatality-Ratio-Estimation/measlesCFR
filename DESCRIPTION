@@ -1,0 +1,19 @@
+Package: measlesCFR
+Title: Measles Case Fatality Rate
+Version: 0.0.0.9000
+Authors@R: 
+    person("Alyssa", "Sbarra", , "asbarra@uw.edu", role = c("aut", "cre"))
+    person("Allison", "Portnoy", , "aportnoy@mail.harvard.edu", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+Imports:
+    data.table,
+    tidyverse,
+    arm,
+    msm,
+    reticulate,
+    stats,
+    ggplot2
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1

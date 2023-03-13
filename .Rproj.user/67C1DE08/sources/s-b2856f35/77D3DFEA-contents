@@ -1,0 +1,18 @@
+#' Create a projection data frame.
+#'
+#' @description Some description here.
+#'
+#' @param df_incidence A data frame that is long by year.
+#' @param df_coverage Optional, only supply if not using defaults. Long by year.
+#' @param df_else Optional, only supply if not using defaults. Individual input data frame for each additional covariate.
+#' Long by year.
+#' @param bound_sample_range Boolean value (TRUE/FALSE)
+#'
+#' @return projection data frame that is long by year and wide by covariates.
+#' @export
+#'
+#' @examples
+createProjectionDF <- function(df_incidence, df_coverage,
+                               df_else, bound_sample_range) {
+  print("Ciao")
+}

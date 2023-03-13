@@ -1,0 +1,15 @@
+#' Display plots of measles case fatality rate by time.
+#'
+#' @description Some description here.
+#'
+#' @param predict_df Predict data frame.
+#' @param list_of_ages List of years.
+#' @param plot_with_uncertainty Boolean value (TRUE/FALSE). Bounds specified by predict_df. Default=TRUE.
+#'
+#' @return Outputs a multi-panel ggplot faceted by age.
+#' @export
+#'
+#' @examples
+displayTime <- function(predict_df, list_of_ages, plot_with_uncertainty) {
+  print("Goddag")
+}

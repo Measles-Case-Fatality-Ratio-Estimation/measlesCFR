@@ -1,0 +1,28 @@
+#' Display plots of measles case fatality rate by time.
+#'
+#' @description Some description here.
+#'
+#' @param predict_df Predict data frame.
+#' @param list_of_ages List of years.
+#' @param plot_with_uncertainty Boolean value (TRUE/FALSE). Bounds specified by predict_df. Default=TRUE.
+#'
+#' @return Outputs a multi-panel ggplot faceted by age.
+#'
+#' @import data.table
+#' @import ggplot2
+#'
+#' @export
+#'
+#' @examples
+displayTimeCFR <- function(predict_df, list_of_ages = c(0,1,2,3,4), plot_with_uncertainty) {
+  ## ----------------------------------------------------------------------------------------------
+  ## content for displayTimeCFR()
+  ## ----------------------------------------------------------------------------------------------
+  ## main content of function
+  by_time <- ggplot(subset(predict_df, age %in% list_of_ages),aes(x=year,y=predicted_cfr)) +
+    geom_line(aes(x=year, y=predicted_cfr), color='#3E71A8') +
+    geom_ribbon(data=subset(predict_df, age %in% list_of_ages), aes(x=year,ymin=predicted_cfr_lb, ymax=predicted_cfr_ub), fill='#3E71A8', alpha=0.3) +
+    theme_bw() + facet_wrap(~age) + xlab("Year") + ylab("CFR")
+
+  return(by_time)
+}

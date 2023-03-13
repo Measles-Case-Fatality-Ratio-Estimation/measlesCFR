@@ -1,0 +1,11 @@
+#' Title
+#'
+#' @param num
+#'
+#' @return
+#' @export
+#'
+#' @examples
+displayTime <- function(num) {
+  print(num * 3)
+}

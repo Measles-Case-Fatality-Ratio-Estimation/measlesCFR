@@ -1,0 +1,26 @@
+{
+    "id": "2020E432",
+    "path": "~/measlesCFR/R/displayCovariates.R",
+    "project_path": "R/displayCovariates.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1667507821139.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "11,18",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1667507902,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1667507902392,
+    "read_only": false,
+    "read_only_alternatives": []
+}

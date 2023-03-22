@@ -9,10 +9,11 @@ mrbrt <- NULL
 
   env <- py_config()$python
   use_python(env)
+
   reticulate::conda_install(env, packages = c("mrtool==0.1.0"))
   reticulate::conda_install(env, packages = c("dill==0.3.6"))
   ## use_virtualenv("~/.virtualenvs/r-reticulate", required = TRUE)
-  reticulate::use_virtualenv("r-reticulate", required = TRUE)
+  reticulate::use_virtualenv(env", required = TRUE)
   mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
   ## mrbrt <<- reticulate::import("mrtool")
   for (nm in names(mrbrt)) assign(nm, mrbrt[[nm]], parent.env(environment()))

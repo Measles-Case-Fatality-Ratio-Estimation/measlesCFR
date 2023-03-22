@@ -4,12 +4,17 @@ mrbrt <- NULL
 .onLoad <- function(libname, pkgname) {
   ## Download pip packages for  dill and mrtool
   ## virtualenv_create("r-reticulate")
-  reticulate::virtualenv_install("r-reticulate", packages = c("mrtool==0.1.0"))
-  reticulate::virtualenv_install("r-reticulate", packages = c("dill==0.3.6"))
+
+  ## use_python("/r-reticulate/bin/python", required = T)
+
+  env <- py_config()$python
+  use_python(env)
+  reticulate::conda_install(env, packages = c("mrtool==0.1.0"))
+  reticulate::conda_install(env, packages = c("dill==0.3.6"))
   ## use_virtualenv("~/.virtualenvs/r-reticulate", required = TRUE)
   reticulate::use_virtualenv("r-reticulate", required = TRUE)
-  ## mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
-  mrbrt <<- reticulate::import("mrtool")
+  mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
+  ## mrbrt <<- reticulate::import("mrtool")
   for (nm in names(mrbrt)) assign(nm, mrbrt[[nm]], parent.env(environment()))
 
   ## Load baseline and vaccination covariate CSVs (used in predictCFR.R)

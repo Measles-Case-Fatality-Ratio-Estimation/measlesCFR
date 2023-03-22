@@ -5,7 +5,7 @@ mbrt <- NULL
   virtualenv_create("r-reticulate")
   virtualenv_install("r-reticulate", packages = c("mrtool==0.1.0"))
   virtualenv_install("r-reticulate", packages = c("dill==0.3.6"))
-  use_virtualenv("r-reticulate")
+  use_virtualenv("~/.virtualenvs/r-reticulate")
   mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
 
   ## Load baseline and vaccination covariate CSVs (used in predictCFR.R)

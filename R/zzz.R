@@ -3,8 +3,11 @@ mrbrt <- NULL
 .onLoad <- function(libname, pkgname) {
   ## Download pip packages for  dill and mrtool
   virtualenv_create("measles_conda")
-  virtualenv_install("measles_conda", packages = c("mrtool==0.1.0"))
-  virtualenv_install("measles_conda", packages = c("dill==0.3.6"))
+  use_virtualenv("measles_conda")
+  env <- py_config()$python
+  use_python(env, required = T)
+  py_install("measles_conda", packages = c("mrtool==0.1.0"), pip = TRUE)
+  py_install("measles_conda", packages = c("dill==0.3.6"), pip = TRUE)
   use_virtualenv("measles_conda")
   mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
 

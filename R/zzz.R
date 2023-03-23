@@ -2,9 +2,10 @@ mrbrt <- NULL
 
 .onLoad <- function(libname, pkgname) {
   ## Download pip packages for  dill and mrtool
-  library(reticulate)
-  py_install(packages = c("mrtool==0.1.0"))
-  py_install(packages = c("dill==0.3.6"))
+  virtualenv_create("measles_conda")
+  virtualenv_install("measles_conda", packages = c("mrtool==0.1.0"))
+  virtualenv_install("measles_conda", packages = c("dill==0.3.6"))
+  use_virtualenv("measles_conda")
   mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
 
   ## Load baseline and vaccination covariate CSVs (used in predictCFR.R)

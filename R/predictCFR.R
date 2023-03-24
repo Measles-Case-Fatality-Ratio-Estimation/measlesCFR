@@ -179,8 +179,9 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
 
   # -----------------------------------------------------------------------------------------------
   # load MR-BRT model object and samples ----------------------------------------------------------
-  # load(file = 'data/mrbrt_samples.RData')
-  mod_cfr <- py_load_object(filename = 'data/mrbrt_mod_cfr_object.pkl', pickle = "dill")
+  data("mrbrt_samples")
+  pickle_filepath = system.file(package = "measlesCFR", "extdata", "mrbrt_mod_cfr_object.pkl")
+  mod_cfr <- py_load_object(filename = pickle_filepath, pickle = "dill")
 
   # -----------------------------------------------------------------------------------------------
   # get point predictions from fixed effects ------------------------------------------------------

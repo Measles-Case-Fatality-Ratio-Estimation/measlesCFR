@@ -179,7 +179,7 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
 
   # -----------------------------------------------------------------------------------------------
   # load MR-BRT model object and samples ----------------------------------------------------------
-  load(file = 'data/mrbrt_samples.RData')
+  # load(file = 'data/mrbrt_samples.RData')
   mod_cfr <- py_load_object(filename = 'data/mrbrt_mod_cfr_object.pkl', pickle = "dill")
 
   # -----------------------------------------------------------------------------------------------

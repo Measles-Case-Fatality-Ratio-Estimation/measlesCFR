@@ -30,7 +30,8 @@
 #' accompanying warning. The sample bounds will be applied to any
 #' visualizations that display covariates in other package functions.
 #' If TRUE, the package will restrict user-specified covariate values to the
-#' sample range that the model was fit to [see Details].
+#' sample range that the model was fit to. Please see below (Details section)
+#' for more information.
 #'
 #' @details First, this function transforms each covariate according to the
 #' defined model fit in Sbarra, et al. (2023):

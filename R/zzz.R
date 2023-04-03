@@ -5,7 +5,7 @@ mrbrt <- NULL
   reticulate::virtualenv_create("measles_conda")
   reticulate::use_virtualenv("measles_conda", required = TRUE)
   env <- reticulate::py_config()$python
-  ## reticulate::use_python(env, required = T)
+  reticulate::use_python(env, required = T)
   Sys.setenv("RETICULATE_PYTHON" = env)
   reticulate::py_config()
   reticulate::py_install("measles_conda", packages = c("mrtool==0.1.0"), pip = TRUE)

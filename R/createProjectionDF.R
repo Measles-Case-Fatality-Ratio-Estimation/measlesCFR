@@ -173,7 +173,7 @@ createProjectionDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
     df_prop_urban$prop_urban_standardized <- (df_prop_urban$prop_urban - mean_prop_urban) / sd_prop_urban
 
     if(bound_sample_range == T){
-      max_prop_urban <- as.numeric(fread(measlsesCFR::prop_urban_max))
+      max_prop_urban <- as.numeric(fread(measlesCFR::prop_urban_max))
       min_prop_urban <- as.numeric(fread(measlesCFR::prop_urban_min))
 
       for(y in 1:length(unique(df_prop_urban$year))){

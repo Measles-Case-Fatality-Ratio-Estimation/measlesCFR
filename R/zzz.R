@@ -2,20 +2,31 @@ mrbrt <- NULL
 
 .onLoad <- function(libname, pkgname) {
   ## Download pip packages for  dill and mrtool
-  # reticulate::virtualenv_create("measles_conda")
-  # reticulate::use_virtualenv("measles_conda", required = TRUE)
+  reticulate::virtualenv_create("measles_conda")
+  reticulate::use_virtualenv("measles_conda", required = TRUE)
+  env <- reticulate::py_config()$python
+  reticulate::use_python(env, required = T)
+  Sys.setenv("RETICULATE_PYTHON" = env)
+  reticulate::py_config()
+  reticulate::py_install("measles_conda", packages = c("mrtool==0.1.0"), pip = TRUE)
+  reticulate::py_install("measles_conda", packages = c("dill==0.3.6"), pip = TRUE)
+  mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
+
+  #reticulate::use_virtualenv("r-reticulate", required = TRUE)
   # env <- reticulate::py_config()$python
   # reticulate::use_python(env, required = T)
   # Sys.setenv("RETICULATE_PYTHON" = env)
   # reticulate::py_config()
-  # reticulate::py_install("measles_conda", packages = c("mrtool==0.1.0"), pip = TRUE)
-  # reticulate::py_install("measles_conda", packages = c("dill==0.3.6"), pip = TRUE)
+  # reticulate::py_install(packages = c("mrtool==0.1.0"), pip = TRUE)
+  # reticulate::py_install(packages = c("dill==0.3.6"), pip = TRUE)
   # mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
 
-  reticulate::py_install(packages = c("mrtool==0.1.0"), pip = TRUE)
-  reticulate::py_install(packages = c("dill==0.3.6"), pip = TRUE)
-  # reticulate::use_virtualenv("r-reticulate")
-  mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
+
+  # env <- reticulate::py_config()$python
+  # Sys.setenv("RETICULATE_PYTHON" = env)
+  # reticulate::py_install("r-reticulate", packages = c("mrtool==0.1.0"), pip = TRUE)
+  # reticulate::py_install("r-reticulate", packages = c("dill==0.3.6"), pip = TRUE)
+  # mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
 
   ## Load baseline and vaccination covariate CSVs (used in predictCFR.R)
   baseline_covariates = system.file("extdata", "transformed_standardized_covaraite_set_with_incidence.csv", package = "measlesCFR", mustWork = TRUE)

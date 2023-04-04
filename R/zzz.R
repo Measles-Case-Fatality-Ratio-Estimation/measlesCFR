@@ -2,15 +2,27 @@ mrbrt <- NULL
 
 .onLoad <- function(libname, pkgname) {
   ## Download pip packages for  dill and mrtool
+
+  # python_path <- Sys.which("python")
+  # reticulate::virtualenv_create(envname = "measles_conda", python = python_path)
+  # reticulate::use_virtualenv("measles_conda", required = TRUE)
+  # env <- reticulate::py_config()$python
+  # reticulate::use_python(env, required = T)
+  # Sys.setenv("RETICULATE_PYTHON" = env)
+  # reticulate::py_config()
+  # reticulate::py_install("measles_conda", packages = c("mrtool==0.1.0"), pip = TRUE)
+  # reticulate::py_install("measles_conda", packages = c("dill==0.3.6"), pip = TRUE)
+  # mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
+
   python_path <- Sys.which("python")
-  reticulate::virtualenv_create(envname = "measles_conda", python = python_path)
-  reticulate::use_virtualenv("measles_conda", required = TRUE)
-  env <- reticulate::py_config()$python
-  reticulate::use_python(env, required = T)
-  Sys.setenv("RETICULATE_PYTHON" = env)
-  reticulate::py_config()
-  reticulate::py_install("measles_conda", packages = c("mrtool==0.1.0"), pip = TRUE)
-  reticulate::py_install("measles_conda", packages = c("dill==0.3.6"), pip = TRUE)
+  # reticulate::virtualenv_create(envname = "measles_conda", python = python_path)
+  # reticulate::use_virtualenv("measles_conda", required = TRUE)
+  #env <- reticulate::py_config()$python
+  reticulate::use_python(python_path, required = T)
+  Sys.setenv("RETICULATE_PYTHON" = python_path)
+  # reticulate::py_config()
+  reticulate::py_install(packages = c("mrtool==0.1.0"), pip = TRUE)
+  reticulate::py_install(packages = c("dill==0.3.6"), pip = TRUE)
   mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
 
   #reticulate::use_virtualenv("r-reticulate", required = TRUE)

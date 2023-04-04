@@ -2,7 +2,8 @@ mrbrt <- NULL
 
 .onLoad <- function(libname, pkgname) {
   ## Download pip packages for  dill and mrtool
-  reticulate::virtualenv_create("measles_conda")
+  python_path <- Sys.which("python")
+  reticulate::virtualenv_create(envname = "measles_conda", python = python_path)
   reticulate::use_virtualenv("measles_conda", required = TRUE)
   env <- reticulate::py_config()$python
   reticulate::use_python(env, required = T)

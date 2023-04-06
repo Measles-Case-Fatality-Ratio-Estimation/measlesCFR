@@ -14,7 +14,10 @@ mrbrt <- NULL
   # reticulate::py_install("measles_conda", packages = c("dill==0.3.6"), pip = TRUE)
   # mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
 
-  python_path <- Sys.which("python")
+  python_path <- Sys.which("python3")
+  if (python_path == ""){
+    python_path <- Sys.which("python")
+  }
   # reticulate::virtualenv_create(envname = "measles_conda", python = python_path)
   # reticulate::use_virtualenv("measles_conda", required = TRUE)
   #env <- reticulate::py_config()$python

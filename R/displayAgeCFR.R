@@ -30,6 +30,10 @@
 #' @export
 #'
 displayAgeCFR <- function(predict_df, list_of_years = c(2000, 2010, 2019)) {
+  age = NULL
+  predicted_cfr = NULL
+  predicted_cfr_lb = NULL
+  predicted_cfr_ub = NULL
   by_age <- ggplot(subset(predict_df, year %in% list_of_years)) +
     geom_line(aes(x=age, y=predicted_cfr), color='#870E75',) +
     geom_ribbon(data=subset(predict_df, year %in% list_of_years), aes(x=age,ymin=predicted_cfr_lb, ymax=predicted_cfr_ub), fill='#870E75', alpha=0.3) +

@@ -1,0 +1,81 @@
+---
+title: "measles-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{measles-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Installing
+```{r setup}
+library(measlesCFR)
+```
+
+## Step 1
+Note: If only using default values you can skip to step 5.
+```{r}
+userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F)
+userSpecifiedHistoricDF
+```
+***Allison to explain bound_sample_range, local file paths, date ranges, and flexibility with any covariates here***
+
+## Step 2
+```{r}
+userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F)
+userSpecifiedProjectionDF
+```
+Note: please refer to createHistoricDF in step 1 for more information about assumptions and defaults.
+
+## Step 3
+```{r}
+userSpecifiedInputDf <- createInputDF(country = 'AFG', historic_include=T, projection_include=F,
+                          vaccination_scenario='baseline', start_year=1990)
+userSpecifiedInputDf
+```
+***Allison to explain how to pass in historic DF and projection DFs that were created in step 1 and 2 into this function (explain that projection_include will need to be changed to true). Explain that end year defaults to 2100, otherwise it will be the latest year provide in user dfs***
+
+## Step 4
+```{r}
+displayCovariates(country = 'AFG')
+```
+
+***Allison to add a note saying that the main purpose of this function is to check covariates for user input DF but that it’s possible to check the defaults. Explain that they can pass in inputDF that was created in step 3 into function. Explain output is ggplot object but can save output for alternative uses***
+
+## Step 5
+```{r}
+userGeneratedPredictCFR <- predictCFR(country = 'AFG', 
+                                      vaccination_scenario = 'baseline', 
+                                      age_start = 0,
+                                      age_end = 34, 
+                                      year_start = 1990, 
+                                      year_end = 2019, 
+                                      community_indicator = 1, 
+                                      get_draws = F, upper_bound = 0.975, 
+                                      lower_bound = 0.025)
+userGeneratedPredictCFR
+```
+***Allison to explain how to pass in userGeneratedInputDF. Explain vaccination_scenario = 'no_vaccination'. Explain hospital based vs community-based. community_indicator=0. Explain get draws = T. Explanation about different age start/end and year start/end and upper and lower bounds***
+
+
+## Step 6
+```{r}
+displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2000, 2010, 2019))
+```
+***Allison to explain passing the predictdf from step 5 to this function. Add a note that they can save the output and display it however they want***
+
+## Step 7
+```{r}
+displayTimeCFR(predict_df = userGeneratedPredictCFR, list_of_ages = c(0,1,2,3,4))
+```
+***Allison to explain passing the predictdf from step 5 to this function. Add a note that they can save the output and display it however they want***
+
+## Final
+***Allison to copy/paste loop explanation for looping over all countries***

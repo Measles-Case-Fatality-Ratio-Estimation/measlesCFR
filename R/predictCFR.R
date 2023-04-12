@@ -139,7 +139,7 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
 
   setDTthreads(1)
   country_iso3 <- country
-
+  reticulate::use_condaenv("mrtool-0.1.0")
   # -----------------------------------------------------------------------------------------------
   # read covariates for prediction frame ----------------------------------------------------------
   if (missing(inputDF)) {
@@ -165,7 +165,7 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
 
   # -----------------------------------------------------------------------------------------------
   # make MR-BRT prediction object -----------------------------------------------------------------
-  data_pred <- mrbrt$MRData()
+  data_pred <- mrtool$MRData()
   data_pred$load_df(data=pred_frame2,
                     col_covs=list( "incidence_standardized",
                                    "maternal_education_standardized",
@@ -180,6 +180,7 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
   # -----------------------------------------------------------------------------------------------
   # load MR-BRT model object and samples ----------------------------------------------------------
   data("mrbrt_samples")
+  ##load_mrbrt_samples <- measlesCFR::mrbrt_samples
   pickle_filepath = system.file(package = "measlesCFR", "extdata", "mrbrt_mod_cfr_object.pkl")
   mod_cfr <- py_load_object(filename = pickle_filepath, pickle = "dill")
 

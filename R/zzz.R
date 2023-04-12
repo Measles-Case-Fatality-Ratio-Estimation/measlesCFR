@@ -1,57 +1,21 @@
-mrbrt <- NULL
+mrtool <- NULL
 
 .onLoad <- function(libname, pkgname) {
-  ## Download pip packages for  dill and mrtool
-
-  # python_path <- Sys.which("python")
-  # reticulate::virtualenv_create(envname = "measles_conda", python = python_path)
-  # reticulate::use_virtualenv("measles_conda", required = TRUE)
-  # env <- reticulate::py_config()$python
-  # reticulate::use_python(env, required = T)
-  # Sys.setenv("RETICULATE_PYTHON" = env)
-  # reticulate::py_config()
-  # reticulate::py_install("measles_conda", packages = c("mrtool==0.1.0"), pip = TRUE)
-  # reticulate::py_install("measles_conda", packages = c("dill==0.3.6"), pip = TRUE)
-  # mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
-
-  python_path <- Sys.which("python3")
-  if (python_path == ""){
-    python_path <- Sys.which("python")
-  }
-  # reticulate::virtualenv_create(envname = "measles_conda", python = python_path)
-  # reticulate::use_virtualenv("measles_conda", required = TRUE)
-  #env <- reticulate::py_config()$python
-  reticulate::use_python(python_path, required = T)
-  Sys.setenv("RETICULATE_PYTHON" = python_path)
-  # reticulate::py_config()
-  reticulate::py_install(packages = c("mrtool==0.1.0"), pip = TRUE)
-  reticulate::py_install(packages = c("dill==0.3.6"), pip = TRUE)
-  mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
-
-  #reticulate::use_virtualenv("r-reticulate", required = TRUE)
-  # env <- reticulate::py_config()$python
-  # reticulate::use_python(env, required = T)
-  # Sys.setenv("RETICULATE_PYTHON" = env)
-  # reticulate::py_config()
-  # reticulate::py_install(packages = c("mrtool==0.1.0"), pip = TRUE)
-  # reticulate::py_install(packages = c("dill==0.3.6"), pip = TRUE)
-  # mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
-
-
-  # env <- reticulate::py_config()$python
-  # Sys.setenv("RETICULATE_PYTHON" = env)
-  # reticulate::py_install("r-reticulate", packages = c("mrtool==0.1.0"), pip = TRUE)
-  # reticulate::py_install("r-reticulate", packages = c("dill==0.3.6"), pip = TRUE)
-  # mrbrt <<- reticulate::import("mrtool", delay_load = TRUE)
+  library(reticulate)
+  #install_miniconda()
+  conda_create(envname = 'mrtool-0.1.0', python_version = '3.10')
+  py_install(envname = 'mrtool-0.1.0', packages = c('mrtool==0.1.0', 'dill'), pip = TRUE)
+  Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS='true');
+  mrtool <<- reticulate::import("mrtool", delay_load = TRUE)
 
   ## Load baseline and vaccination covariate CSVs (used in predictCFR.R)
   baseline_covariates = system.file("extdata", "transformed_standardized_covaraite_set_with_incidence.csv", package = "measlesCFR", mustWork = TRUE)
   assign('baseline_covariates', baseline_covariates, envir = parent.env(environment()))
 
-  no_vax_covariates = system.file("extdata", "transformed_standardized_covaraite_set_with_incidence_no_vax_revised_10march2023.csv", package = "measlesCFR", mustWork = TRUE)
+  no_vax_covariates = system.file("extdata", "transformed_standardized_covariate_set_with_incidence_no_vax.csv", package = "measlesCFR", mustWork = TRUE)
   assign('no_vax_covariates', no_vax_covariates, envir = parent.env(environment()))
 
-  no_vax_projection_covariates = system.file("extdata", "transformed_standardized_covaraite_set_with_incidence_no_vax_PROJECTION_revised_10march2023.csv", package = "measlesCFR", mustWork = TRUE)
+  no_vax_projection_covariates = system.file("extdata", "transformed_standardized_covariate_set_w_incidence_no_vax_PROJECTION.csv", package = "measlesCFR", mustWork = TRUE)
   assign('no_vax_projection_covariates', no_vax_covariates, envir = parent.env(environment()))
 
   ## Load CSVs for createProjectionDF.R

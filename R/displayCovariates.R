@@ -27,6 +27,13 @@
 #' @export
 displayCovariates <- function(country, inputDF=NULL) {
   if (missing(inputDF)) {
+    ihme_loc_id = NULL
+    year_id = NULL
+    origin = NULL
+    value = NULL
+    value_origin = NULL
+    Z = NULL
+
     inputDF_original <- fread(measlesCFR::square_covariate_set)
 
     inputDF_original <- subset(inputDF_original, ihme_loc_id == country & year_id %in% c(1990:2019))

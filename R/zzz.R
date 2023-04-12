@@ -1,7 +1,7 @@
 mrtool <- NULL
 
 .onLoad <- function(libname, pkgname) {
-  library(reticulate)
+  # library(reticulate)
   #install_miniconda()
   conda_create(envname = 'mrtool-0.1.0', python_version = '3.10')
   py_install(envname = 'mrtool-0.1.0', packages = c('mrtool==0.1.0', 'dill'), pip = TRUE)

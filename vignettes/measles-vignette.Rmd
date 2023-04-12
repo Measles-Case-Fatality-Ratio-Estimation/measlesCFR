@@ -25,7 +25,23 @@ Note: If only using default values you can skip to step 5.
 userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F)
 userSpecifiedHistoricDF
 ```
-***Allison to explain bound_sample_range, local file paths, date ranges, and flexibility with any covariates here***
+Note Step 1 currently relies on default values. In order to specify alternative covariate values, prior to Step 1, set working directory, i.e., setwd(‘local file path’), to the local file path with the CSV dataframe file of covariate values being used, which should be long by year and wide by covariates. Then load the CSV file into the R environment, such as:
+
+```{r eval=FALSE}
+localDF <- read.csv('localDF.csv',header=TRUE)
+```
+
+With this CSV file, the user can specify any/all covariate values to differentiate from default  package values. For example:
+
+```{r eval=FALSE}
+userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_incidence = localDF[,c('year','incidence_standardized')], df_mcv1 = localDF[,c('year","mcv1_standardized')], df_maternal_education = localDF[,c('year','maternal_education_standardized')], df_u5mr = localDF[,c('year','u5mr_standardized')], df_prop_urban = localDF[,c('year","prop_urban_standardized')], df_vitA = localDF[,c('year","vitA_standardized')])
+```
+
+Note the covariate names may differ in your local CSV file, adjust accordingly.
+
+Note that the date range for predictions is limited to the year(s) provided for covariate values. For example, if the user specifies a date range of 2000-2010 for measles incidence, ```predictCFR()`` can only provide measles CFR estimates for 2000-2010. Default covariate values for the historic dataframe include 1990-2019.
+
+bound_sample_range is a Boolean value (TRUE/FALSE). If set to FALSE (default), the package will provide measles CFR estimates with an accompanying warning if input values fall outside the sample range of covariate values used for model fitting. The sample bounds will be applied to the multi-panel ggplot object created by the ```displayCovariates()``` function. If set to TRUE, the package will restrict and adjust user-specified covariate values to the sample range of covariate values used for model fitting. See Details for ```createHistoricDF()``` in the package documentation.
 
 ## Step 2
 ```{r}
@@ -40,14 +56,38 @@ userSpecifiedInputDf <- createInputDF(country = 'AFG', historic_include=T, proje
                           vaccination_scenario='baseline', start_year=1990)
 userSpecifiedInputDf
 ```
-***Allison to explain how to pass in historic DF and projection DFs that were created in step 1 and 2 into this function (explain that projection_include will need to be changed to true). Explain that end year defaults to 2100, otherwise it will be the latest year provide in user dfs***
+
+Note Step 3 currently relies on default values. In order to rely on user-specified data.frame object(s) created in Steps 1 and/or 2, load the data.frame object(s) from the local environment, such as:
+
+```{r eval=FALSE}
+userSpecifiedInputDF <- createInputDF(country = 'AFG',
+                                      historic = userSpecifiedHistoricDF, 
+                                      projectionDF = userSpecifiedProjectionDF,
+                                      historic_include=T,
+                                      projection_include=T,
+                                      vaccination_scenario='baseline',
+                                      start_year=1990)
+```
+
+Note that 'projection_include' is set to FALSE as a default, and must be set to TRUE to include the projection period in CFR estimation. 
+
+Note that the date range for predictions is limited to the year(s) provided for covariate values. For example, if the user specifies a date range of 2020-2030 for measles incidence in ```createProjectionDF()``` and loads that data.frame object into ```createInputDF()```, ```predictCFR()``` can only provide measles CFR estimates for 2020-2030. Default covariate values for the historic data.frame object include 1990-2019 and for the projection data.frame object include 2020-2100.
 
 ## Step 4
 ```{r}
 displayCovariates(country = 'AFG')
 ```
 
-***Allison to add a note saying that the main purpose of this function is to check covariates for user input DF but that it’s possible to check the defaults. Explain that they can pass in inputDF that was created in step 3 into function. Explain output is ggplot object but can save output for alternative uses***
+Note that the ```displayCovariates()``` function is intended to visualize covariate values specified by the user to ensure trends match expectations and compare to the covariate sample range, if relevant. The user would need to include their input data.frame object as an argument accordingly, such as:
+
+```{r eval=FALSE}
+displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF)
+```
+
+However, ```displayCovariates()``` can be used to check default values per the specification in Step 4.
+
+The output of ```displayCovariates()``` is a multi-panel ggplot object. The covariate value output created in Step 3 with ```createInputDF()``` can be saved to the R environment and/or local files for alternative visualizations/uses. 
+
 
 ## Step 5
 ```{r}
@@ -62,20 +102,86 @@ userGeneratedPredictCFR <- predictCFR(country = 'AFG',
                                       lower_bound = 0.025)
 userGeneratedPredictCFR
 ```
-***Allison to explain how to pass in userGeneratedInputDF. Explain vaccination_scenario = 'no_vaccination'. Explain hospital based vs community-based. community_indicator=0. Explain get draws = T. Explanation about different age start/end and year start/end and upper and lower bounds***
+
+Note Step 5 currently relies on default values. In order to rely on user-specified data.frame object(s) created in Step 3, load the data.frame object(s) from the local environment, such as:
+
+```{r eval=FALSE}
+userGeneratedPredictCFR <- predictCFR(country = 'AFG',
+                                      inputDF = userSpecifiedInputDF,
+                                      vaccination_scenario = 'baseline', 
+                                      age_start = 0,
+                                      age_end = 34, 
+                                      year_start = 1990, 
+                                      year_end = 2019, 
+                                      community_indicator = 1, 
+                                      get_draws = F, upper_bound = 0.975, 
+                                      lower_bound = 0.025)
+```
+
+Step 5 currently outputs predicted CFR in the context of a vaccination program with MCV1 coverage set to default or user-specified covariate values. In order to predict CFRs in a 'no vaccination' scenario, i.e., no established vaccination program in a country setting, the vaccination_scenario argument must be set to 'no_vaccination'. By specifying 'no_vaccination', the MCV1 coverage values will automatically be set to zero and default measles incidence will rely on associated incidence estimates in the context of no vaccination. If the user relies on user-specified measles incidence, these inputs will be used in ```predictCFR()``` but MCV1 coverage will still be set to zero. Use caution when specifying measles incidence and vaccination_scenario = 'no_vaccination' without accounting for the removal of the vaccination program in incidence estimates.
+
+Step 5 currently outputs predicted CFR for community-based measles cases, i.e., community_indicator = 1. In order to output predicted CFR for hospital-based measles cases, set community_indicator=0.
+
+Step 5 currently outputs only mean, confidence interval lower bound, and confidence interval upper bound predicted CFRs according to the specified 'lower_bound' and 'upper_bound' arguments for the confidence interval because the 'get_draws' argument is set to FALSE. When 'get_draws' is set to TRUE, ```predictCFR()``` will output mean, lower bound, and upper bound predicted CFRs as well as 1000 unique draws of predicted CFR. The 'lower_bound' argument defaults to 0.025 and the 'upper_bound' argument defaults to 0.975, but can be modified by the user.  
+
+The ```predictCFR()``` function will generate predicted CFRs for all unique ages and years, unless different age start/end and year start/end values are specified, but the function cannot generate predictions without covariate values for the associated year(s). The arguments for age start/end are integer values bounded between 0 and 100. The arguments for year start/end are integer values bounded between 1980 and 2100.
 
 
 ## Step 6
 ```{r}
 displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2000, 2010, 2019))
 ```
-***Allison to explain passing the predictdf from step 5 to this function. Add a note that they can save the output and display it however they want***
+
+Note Step 6 currently relies on default values. In order to rely on user-specified predictions created in Step 5, load the predictions created by ```predictCFR()``` from the local environment per the code listed in Step 6.
+
+The output of ```displayAgeCFR()``` is a multi-panel ggplot object. The covariate value output created in Step 5 with ```predictCFR()``` can be saved to the R environment and/or local files for alternative visualizations/uses. 
+
 
 ## Step 7
 ```{r}
 displayTimeCFR(predict_df = userGeneratedPredictCFR, list_of_ages = c(0,1,2,3,4))
 ```
-***Allison to explain passing the predictdf from step 5 to this function. Add a note that they can save the output and display it however they want***
+
+Note Step 7 currently relies on default values. In order to rely on user-specified predictions created in Step 5, load the predictions created by predictCFR() from the local environment per the code listed in Step 7.
+
+The output of ```displayTimeCFR()``` is a multi-panel ggplot object. The covariate value output created in Step 5 with ```predictCFR()``` can be saved to the R environment and/or local files for alternative visualizations/uses.
+
 
 ## Final
-***Allison to copy/paste loop explanation for looping over all countries***
+The ```predictCFR()``` function in Step 5 will return estimated measles CFRs for a single country, defined by the supplied three-digit ISO3 code for the country in which to estimate measles CFRs. In order to set up a loop to return estimates across multiple countries, the user must first save a vector of ISO3 codes for the countries of interest as a CSV file, see Details in package documentation.
+
+From your working directory, load your dataframe as a CSV file into your R environment:
+
+```{r eval=FALSE}
+countries <- read.csv("LMIC_codes.csv",header=TRUE)
+```
+
+Run the measlesCFR package as a loop per the following code, revising your inputs and arguments accordingly. This example loops through the above countries for children ages 0 to 4 from years 2000 to 2030, assuming community-based cases given a vaccination program, returning only the mean, upper bound (0.975 percentile), and lower bound (0.025 percentile) estimates.
+
+```{r eval=FALSE}
+## your file path
+directory <- 'C:/'
+setwd(directory)
+## your inputDF object
+covariates <- inputDF()
+
+for (i0 in 1:length(countries){
+
+	i <- countries[i0]
+
+	output <- predictCFR(country = i,
+	                     inputDF = covariates,
+	                     vaccination_scenario = “baseline”,
+	                     start_age = 0,
+	                     end_age = 4,
+	                     year_start = 2000,
+	                     year_end = 2030,
+	                     community_indicator=1,
+	                     get_draws = FALSE,
+	                     upper_bound = 0.975,
+	                     lower_bound = 0.025)
+
+	write.csv(output,paste0(directory,"output_",i,".csv"), row.names = FALSE)
+}
+
+```

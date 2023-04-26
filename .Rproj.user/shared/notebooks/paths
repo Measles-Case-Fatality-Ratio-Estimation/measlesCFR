@@ -1,8 +1,0 @@
-/ihme/homes/everdyke/measlesCFR/DESCRIPTION="28E9AA0C"
-/ihme/homes/everdyke/measlesCFR/R/createHistoricDF.R="4B09B8F5"
-/ihme/homes/everdyke/measlesCFR/R/createInputDF.R="354BBD6E"
-/ihme/homes/everdyke/measlesCFR/R/createProjectionDF.R="86EAB81C"
-/ihme/homes/everdyke/measlesCFR/R/displayAgeCFR.R="455B2EDF"
-/ihme/homes/everdyke/measlesCFR/R/displayCovariates.R="46D53A52"
-/ihme/homes/everdyke/measlesCFR/R/displayTimeCFR.R="71B22D53"
-/ihme/homes/everdyke/measlesCFR/man/displayCovariates.Rd="8F210269"

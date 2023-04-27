@@ -3,11 +3,8 @@ mrtool <- NULL
 .onLoad <- function(libname, pkgname) {
   library(reticulate)
   #install_miniconda()
-  python_path <- py_config()$python
-  use_python(python_path, required = T)
-  Sys.setenv("RETICULATE_PYTHON" = python_path)
-  # conda_create(envname = 'mrtool-0.1.0', python_version = '3.10')
-  py_install(envname = 'r-reticulate', packages = c('mrtool==0.1.0', 'dill', 'spmat==0.0.9'), pip = TRUE)
+  conda_create(envname = 'mrtool-0.1.0', python_version = '3.10')
+  py_install(envname = 'mrtool-0.1.0', packages = c('mrtool==0.1.0', 'dill', 'spmat==0.0.9'), pip = TRUE)
   Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS='true');
   mrtool <<- reticulate::import("mrtool", delay_load = TRUE)
 

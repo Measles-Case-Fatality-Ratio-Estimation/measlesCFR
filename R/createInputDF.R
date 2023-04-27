@@ -46,17 +46,17 @@ createInputDF <- function(country, historic_include=T, projection_include=F,
 
     if(historic_include == T & missing(historicDF)){
       if(vaccination_scenario == "baseline"){
-        historicDF <- fread(measlesCFR::baseline_covariates)
+        historicDF <- fread(measlesCFR:::baseline_covariates)
       }else if(vaccination_scenario == "no_vaccination"){
-        historicDF <- fread(measlesCFR::no_vax_covariates)
+        historicDF <- fread(measlesCFR:::no_vax_covariates)
       }
       historicDF <- subset(historicDF, country == country_iso3)
     }
     if(projection_include == T & missing(projectionDF)){
       if(vaccination_scenario == "baseline"){
-        projectionDF <- fread(measlesCFR::transformed_covariate_incidence_projections)
+        projectionDF <- fread(measlesCFR:::transformed_covariate_incidence_projections)
       }else if(vaccination_scenario == "no_vaccination"){
-        projectionDF <- fread(measlesCFR::no_vax_projection_covariates)
+        projectionDF <- fread(measlesCFR:::no_vax_projection_covariates)
       }
       projectionDF <- subset(projectionDF, country == country_iso3)
     }

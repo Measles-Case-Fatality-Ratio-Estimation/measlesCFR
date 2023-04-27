@@ -27,15 +27,15 @@
 #' @export
 displayCovariates <- function(country, inputDF=NULL) {
   if (missing(inputDF)) {
-    inputDF_original <- fread(measlesCFR::square_covariate_set)
+    inputDF_original <- fread(measlesCFR:::square_covariate_set)
 
     inputDF_original <- subset(inputDF_original, ihme_loc_id == country & year_id %in% c(1990:2019))
     inputDF_original$year <- inputDF_original$year_id
 
-    incidence_df <- fread(measlesCFR::baseline_covariates)
+    incidence_df <- fread(measlesCFR:::baseline_covariates)
     incidence_df <- subset(incidence_df, country == country & year %in% c(1990:2019))
-    mean_incidence <- as.numeric(fread(measlesCFR::incidence_mean))
-    sd_incidence <- as.numeric(fread(measlesCFR::incidence_sd))
+    mean_incidence <- as.numeric(fread(measlesCFR:::incidence_mean))
+    sd_incidence <- as.numeric(fread(measlesCFR:::incidence_sd))
     incidence_df$incidence <- exp((incidence_df$incidence_standardized * sd_incidence) + mean_incidence ) / (1 + exp((incidence_df$incidence_standardized * sd_incidence) + mean_incidence ))
 
     incidence_df <- subset(incidence_df, select=c("country", "year", "incidence"))
@@ -46,28 +46,28 @@ displayCovariates <- function(country, inputDF=NULL) {
   } else {
     inputDF_original <- inputDF
 
-    mean_mcv1 <- as.numeric(fread(measlesCFR::mcv_mean))
-    sd_mcv1 <- as.numeric(fread(measlesCFR::mcv_sd))
+    mean_mcv1 <- as.numeric(fread(measlesCFR:::mcv_mean))
+    sd_mcv1 <- as.numeric(fread(measlesCFR:::mcv_sd))
     inputDF_original$mcv1 <- (inputDF_original$mcv1_standardized * sd_mcv1) + mean_mcv1
 
-    mean_maternal_education <- as.numeric(fread(measlesCFR::maternal_education_mean))
-    sd_maternal_education <- as.numeric(fread(measlesCFR::maternal_education_sd))
+    mean_maternal_education <- as.numeric(fread(measlesCFR:::maternal_education_mean))
+    sd_maternal_education <- as.numeric(fread(measlesCFR:::maternal_education_sd))
     inputDF_original$maternal_education <- (inputDF_original$maternal_education_standardized * sd_maternal_education) + mean_maternal_education
 
-    mean_incidence <- as.numeric(fread(measlesCFR::incidence_mean))
-    sd_incidence <- as.numeric(fread(measlesCFR::incidence_sd))
+    mean_incidence <- as.numeric(fread(measlesCFR:::incidence_mean))
+    sd_incidence <- as.numeric(fread(measlesCFR:::incidence_sd))
     inputDF_original$incidence <- exp((inputDF_original$incidence_standardized * sd_incidence) + mean_incidence ) / (1 + exp((inputDF_original$incidence_standardized * sd_incidence) + mean_incidence ))
 
-    mean_prop_urban <- as.numeric(fread(measlesCFR::prop_urban_mean))
-    sd_prop_urban <- as.numeric(fread(measlesCFR::prop_urban_sd))
+    mean_prop_urban <- as.numeric(fread(measlesCFR:::prop_urban_mean))
+    sd_prop_urban <- as.numeric(fread(measlesCFR:::prop_urban_sd))
     inputDF_original$prop_urban <- (inputDF_original$prop_urban_standardized * sd_prop_urban) + mean_prop_urban
 
-    mean_u5mr <- as.numeric(fread(measlesCFR::u5mr_mean))
-    sd_u5mr <- as.numeric(fread(measlesCFR::u5mr_sd))
+    mean_u5mr <- as.numeric(fread(measlesCFR:::u5mr_mean))
+    sd_u5mr <- as.numeric(fread(measlesCFR:::u5mr_sd))
     inputDF_original$u5mr <- (inputDF_original$u5mr_standardized * sd_u5mr) + mean_u5mr
 
-    mean_vitA <- as.numeric(fread(measlesCFR::vitA_mean))
-    sd_vitA <- as.numeric(fread(measlesCFR::vitA_sd))
+    mean_vitA <- as.numeric(fread(measlesCFR:::vitA_mean))
+    sd_vitA <- as.numeric(fread(measlesCFR:::vitA_sd))
     inputDF_original$vitA_deficiency <- (inputDF_original$vitA_standardized * sd_vitA) + mean_vitA
 
   }
@@ -83,15 +83,15 @@ displayCovariates <- function(country, inputDF=NULL) {
   d <- melt(d, id = c('year'))
 
   ## set max limits for lines
-  limits_df <- fread(measlesCFR::square_covariate_set)
+  limits_df <- fread(measlesCFR:::square_covariate_set)
 
   limits_df <- subset(limits_df, ihme_loc_id == country & year_id %in% c(1990:2019))
   limits_df$year <- limits_df$year_id
 
-  incidence_df <- fread(measlesCFR::baseline_covariates)
+  incidence_df <- fread(measlesCFR:::baseline_covariates)
   incidence_df <- subset(incidence_df, country == country & year %in% c(1990:2019))
-  mean_incidence <- as.numeric(fread(measlesCFR::incidence_mean))
-  sd_incidence <- as.numeric(fread(measlesCFR::incidence_sd))
+  mean_incidence <- as.numeric(fread(measlesCFR:::incidence_mean))
+  sd_incidence <- as.numeric(fread(measlesCFR:::incidence_sd))
   incidence_df$incidence <- exp((incidence_df$incidence_standardized * sd_incidence) + mean_incidence ) / (1 + exp((incidence_df$incidence_standardized * sd_incidence) + mean_incidence ))
 
   incidence_df <- subset(incidence_df, select=c("country", "year", "incidence"))

@@ -70,7 +70,7 @@ createHistoricDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
                              bound_sample_range=F) {
   # all arguments optional - except country
   country_iso3 <- country
-  historicDF <- fread(measlesCFR::baseline_covariates)
+  historicDF <- fread(measlesCFR:::baseline_covariates)
   historicDF <- subset(historicDF, country == country_iso3)
 
   # mcv1
@@ -78,14 +78,14 @@ createHistoricDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
 
     historicDF$mcv1_standardized <- NULL
 
-    mean_mcv1 <- as.numeric(fread(measlesCFR::mcv_mean))
-    sd_mcv1 <- as.numeric(fread(measlesCFR::mcv_sd))
+    mean_mcv1 <- as.numeric(fread(measlesCFR:::mcv_mean))
+    sd_mcv1 <- as.numeric(fread(measlesCFR:::mcv_sd))
     df_mcv1$mcv1_standardized <- (df_mcv1$mcv1 - mean_mcv1 ) / sd_mcv1
 
     if(bound_sample_range == T){
 
-      max_mcv1 <- as.numeric(fread(measlesCFR::mcv_max))
-      min_mcv1 <- as.numeric(fread(measlesCFR::mcv_min))
+      max_mcv1 <- as.numeric(fread(measlesCFR:::mcv_max))
+      min_mcv1 <- as.numeric(fread(measlesCFR:::mcv_min))
 
       for(y in 1:length(unique(df_mcv1$year))){
         if(df_mcv1$mcv1_standardized[y] > max_mcv1){
@@ -111,14 +111,14 @@ createHistoricDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
 
     historicDF$maternal_education_standardized <- NULL
 
-    mean_maternal_education <- as.numeric(fread(measlesCFR::maternal_education_mean))
-    sd_maternal_education <- as.numeric(fread(measlesCFR::maternal_education_sd))
+    mean_maternal_education <- as.numeric(fread(measlesCFR:::maternal_education_mean))
+    sd_maternal_education <- as.numeric(fread(measlesCFR:::maternal_education_sd))
     df_maternal_education$maternal_education_standardized <- (df_maternal_education$maternal_education - mean_maternal_education ) / sd_maternal_education
 
     if(bound_sample_range == T){
 
-      max_maternal_education <- as.numeric(fread(measlesCFR::maternal_education_max))
-      min_maternal_education <- as.numeric(fread(measlesCFR::maternal_education_min))
+      max_maternal_education <- as.numeric(fread(measlesCFR:::maternal_education_max))
+      min_maternal_education <- as.numeric(fread(measlesCFR:::maternal_education_min))
 
       for(y in 1:length(unique(df_maternal_education$year))){
         if(df_maternal_education$maternal_education_standardized[y] > max_maternal_education){
@@ -143,14 +143,14 @@ createHistoricDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
   if(!missing(df_u5mr)){
     historicDF$u5mr_standardized <- NULL
 
-    mean_u5mr <- as.numeric(fread(measlesCFR::u5mr_mean))
-    sd_u5mr <- as.numeric(fread(measlesCFR::u5mr_sd))
+    mean_u5mr <- as.numeric(fread(measlesCFR:::u5mr_mean))
+    sd_u5mr <- as.numeric(fread(measlesCFR:::u5mr_sd))
     df_u5mr$u5mr_standardized <- (df_u5mr$u5mr - mean_u5mr ) / sd_u5mr
 
     if(bound_sample_range == T){
 
-      max_u5mr <- as.numeric(fread(measlesCFR::u5mr_max))
-      min_u5mr <- as.numeric(fread(measlesCFR::u5mr_min))
+      max_u5mr <- as.numeric(fread(measlesCFR:::u5mr_max))
+      min_u5mr <- as.numeric(fread(measlesCFR:::u5mr_min))
 
       for(y in 1:length(unique(df_u5mr$year))){
         if(df_u5mr$u5mr_standardized[y] > max_u5mr){
@@ -175,14 +175,14 @@ createHistoricDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
   if(!missing(df_prop_urban)){
     historicDF$prop_urban_standardized <- NULL
 
-    mean_prop_urban <- as.numeric(fread(measlesCFR::prop_urban_mean))
-    sd_prop_urban <- as.numeric(fread(measlesCFR::prop_urban_sd))
+    mean_prop_urban <- as.numeric(fread(measlesCFR:::prop_urban_mean))
+    sd_prop_urban <- as.numeric(fread(measlesCFR:::prop_urban_sd))
     df_prop_urban$prop_urban_standardized <- (df_prop_urban$prop_urban - mean_prop_urban) / sd_prop_urban
 
     if(bound_sample_range == T){
 
-      max_prop_urban <- as.numeric(fread(measlesCFR::prop_urban_max))
-      min_prop_urban <- as.numeric(fread(measlesCFR::prop_urban_min))
+      max_prop_urban <- as.numeric(fread(measlesCFR:::prop_urban_max))
+      min_prop_urban <- as.numeric(fread(measlesCFR:::prop_urban_min))
 
       for(y in 1:length(unique(df_prop_urban$year))){
         if(df_prop_urban$prop_urban_standardized[y] > max_prop_urban){
@@ -207,14 +207,14 @@ createHistoricDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
   if(!missing(df_vitA)){
     historicDF$vitA_standardized <- NULL
 
-    mean_vitA <- as.numeric(fread(measlesCFR::vitA_mean))
-    sd_vitA <- as.numeric(fread(measlesCFR::vitA_sd))
+    mean_vitA <- as.numeric(fread(measlesCFR:::vitA_mean))
+    sd_vitA <- as.numeric(fread(measlesCFR:::vitA_sd))
     df_vitA$vitA_standardized <- (df_vitA$vitA - mean_vitA) / sd_vitA
 
     if(bound_sample_range == T){
 
-      max_vitA <- as.numeric(fread(measlesCFR::vitA_max))
-      min_vitA <- as.numeric(fread(measlesCFR::vitA_min))
+      max_vitA <- as.numeric(fread(measlesCFR:::vitA_max))
+      min_vitA <- as.numeric(fread(measlesCFR:::vitA_min))
 
       for(y in 1:length(unique(df_vitA$year))){
         if(df_vitA$vitA_standardized[y] > max_vitA){
@@ -240,14 +240,14 @@ createHistoricDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
 
     historicDF$incidence_standardized <- NULL
 
-    mean_incidence <- as.numeric(fread(measlesCFR::incidence_mean))
-    sd_incidence <- as.numeric(fread(measlesCFR::incidence_sd))
+    mean_incidence <- as.numeric(fread(measlesCFR:::incidence_mean))
+    sd_incidence <- as.numeric(fread(measlesCFR:::incidence_sd))
     df_incidence$incidence_standardized <- (logit(df_incidence$incidence) - mean_incidence) / sd_incidence
 
     if(bound_sample_range == T){
 
-      max_incidence <- as.numeric(fread(measlesCFR::incidence_max))
-      min_incidence <- as.numeric(fread(measlesCFR::incidence_min))
+      max_incidence <- as.numeric(fread(measlesCFR:::incidence_max))
+      min_incidence <- as.numeric(fread(measlesCFR:::incidence_min))
 
       for(y in 1:length(unique(df_incidence$year))){
         if(df_incidence$incidence_standardized[y] > max_incidence){

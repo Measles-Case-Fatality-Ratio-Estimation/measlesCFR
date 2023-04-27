@@ -144,9 +144,9 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
   # read covariates for prediction frame ----------------------------------------------------------
   if (missing(inputDF)) {
     if(vaccination_scenario == "baseline"){
-      covariates <- fread(measlesCFR::baseline_covariates)
+      covariates <- fread(measlesCFR:::baseline_covariates)
     }else if(vaccination_scenario == "no_vaccination"){
-      covariates <- fread(measlesCFR::no_vax_covariates)
+      covariates <- fread(measlesCFR:::no_vax_covariates)
     }
   }
   else {

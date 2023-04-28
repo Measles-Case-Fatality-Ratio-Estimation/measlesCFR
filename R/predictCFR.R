@@ -139,7 +139,7 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
 
   setDTthreads(1)
   country_iso3 <- country
-  reticulate::use_condaenv("mrtool-0.1.0")
+  #reticulate::use_condaenv("mrtool-0.1.0")
   # -----------------------------------------------------------------------------------------------
   # read covariates for prediction frame ----------------------------------------------------------
   if (missing(inputDF)) {

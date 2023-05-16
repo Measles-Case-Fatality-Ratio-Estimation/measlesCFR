@@ -1,12 +1,4 @@
-mrtool <- NULL
-
 .onLoad <- function(libname, pkgname) {
-  library(reticulate)
-  conda_create(envname = 'mrtool-0.1.0', python_version = '3.10')
-  py_install(envname = 'mrtool-0.1.0', packages = c('mrtool==0.1.0', 'dill', 'spmat==0.0.9'), pip = TRUE)
-  use_condaenv(condaenv = "mrtool-0.1.0")
-  Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS='true');
-  mrtool <<- reticulate::import("mrtool", delay_load = TRUE)
 
   ## Load baseline and vaccination covariate CSVs (used in predictCFR.R)
   baseline_covariates = system.file("extdata", "transformed_standardized_covaraite_set_with_incidence.csv", package = "measlesCFR", mustWork = TRUE)

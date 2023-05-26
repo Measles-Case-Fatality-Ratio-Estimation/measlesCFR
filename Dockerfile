@@ -16,4 +16,4 @@ SHELL ["/bin/bash", "-c"]
 # install R dependencies
 RUN R -e "update.packages(ask = FALSE)" && \
     R -e "install.packages('remotes')" && \
-    R -e "library(remotes); Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS='true'); install_github('Measles-Case-Fatality-Ratio-Estimation/measlesCFR', force=TRUE)"
+    R -e "library(remotes); Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS='true'); install_github('Measles-Case-Fatality-Ratio-Estimation/measlesCFR', force=TRUE, build_vignettes=TRUE)"

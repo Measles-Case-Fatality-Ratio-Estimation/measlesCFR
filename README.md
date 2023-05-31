@@ -15,7 +15,7 @@ Below are the steps for running the package (steps modified from Reed Sorensen's
     note that the usual Windows file path will need to be modified slightly. For example,
     C:\Users\myname\data would need to be converted to //c/Users/myname/data.
 3. In a browser, go to localhost:8787. Enter user name “rstudio” and password “dockpass”.
-4. `library(reticualte)`
+4. `library(reticulate)`
 5. `reticulate::use_python("/opt/miniconda/envs/mrtool-0.1.0/bin/python")`
 6. `mrtool <- import("mrtool")`
 7. `library(measlesCFR)`

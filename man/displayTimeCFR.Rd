@@ -35,3 +35,11 @@ lower_bound percentiles in the \code{predictCFR()} object. If plot_uncertainty
 is set to “FALSE,” the multi-panel plots will only include estimated mean
 CFRs by age.
 }
+\examples{
+# Examine predicted CFRs using predictions based on default covariates
+# Rely on list of ages generated through unique values in dataframe
+displayTimeCFR(predictDF=eth_cfr_default)
+# Examine predicted CFRs for ages 0 to 14
+displayAgeCFR(predictDF=eth_cfr, list_of_ages=c(seq(0,14,1))
+
+}

@@ -25,6 +25,12 @@
 #' integer class value that is bounded between 1980 and 2100. end_year
 #' cannot be less than start_year.
 #'
+#' @examples
+#' # Create input DF with package defaults for years 2000 to 2030
+#' eth_inputDF_default <- createInputDF(country="ETH", start_year=2000, end_year=2030)
+#' # Create input DF with user-created historic DF and projection DF
+#' eth_inputDF <- createInputDF(country="ETH", historicDF=eth_historicDF, projectionDF=eth_projectionDF, historic_include=FALSE, projection_include=FALSE, vaccination_scenario="baseline", start_year=1980, end_year=2100)
+#'
 #' @details The function returns the default historic (if historic_include is
 #' set to TRUE) and/or projection (if projection_include is set to TRUE) data
 #' frames as a combined data frame. If the user supplies an historic data
@@ -75,5 +81,10 @@ createInputDF <- function(country, historic_include=T, projection_include=F,
       inputDF <- subset(inputDF, year<=end_year)
     }
 
-  return(inputDF)
+  if(nrow(inputDF) == 0) {
+    return("List returned is empty. You are possibly using an ISO3 country that is not low- or middle-income (you can see list of accepted countries with `listOfCountries()`.")
+  }
+  else {
+    return(inputDF)
+  }
 }

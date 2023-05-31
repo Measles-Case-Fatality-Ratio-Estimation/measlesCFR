@@ -1,10 +1,10 @@
 Package: measlesCFR
 Title: Measles Case Fatality Rate
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: 
     person("Alyssa", "Sbarra", , "asbarra@uw.edu", role = c("aut", "cre"))
     person("Allison", "Portnoy", , "aportnoy@mail.harvard.edu", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: A system for estimating measles case fatality ratios (CFRs) at the country, year, and age level for low- and middle-income countries. Users can inform covariate predictors in both/either the historic or future time periods, and the package will provide the resulting measles CFR estimates.
 Imports:
     data.table,
     tidyverse,

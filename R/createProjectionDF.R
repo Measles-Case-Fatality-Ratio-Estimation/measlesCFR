@@ -34,6 +34,16 @@
 #' sample range that the model was fit to. Please see below (Details section)
 #' for more information.
 #'
+#' @examples
+#' # Set local working directory; revise to location of input files
+#' setwd("E:/")
+#' # Load and save relevant input files to working environment
+#' eth_incidence_proj <- read.csv("eth_incidence.csv",header=TRUE)
+#' eth_mcv1_proj <- read.csv("eth_mcv1.csv",header=TRUE)
+#' # Create projection DF with user-specified incidence and MCV1 coverage
+#' # All other covariates rely on package defaults
+#' eth_projectionDF <- createProjectionDF(country="ETH", df_incidence=eth_incidence_proj, df_mcv1=eth_mcv1_proj)
+#'
 #' @details First, this function transforms each covariate according to the
 #' defined model fit in Sbarra, et al. (2023).
 #'
@@ -259,5 +269,10 @@ createProjectionDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
 
   # ensure projection data frame only goes as far as user specified covariates
   projectionDF <- projectionDF[complete.cases(projectionDF),]
-  return(projectionDF)
+  if(nrow(projectionDF) == 0) {
+    return("List returned is empty. You are possibly using an ISO3 country that is not low- or middle-income (you can see list of accepted countries with `listOfCountries()`.")
+  }
+  else {
+    return(projectionDF)
+  }
 }

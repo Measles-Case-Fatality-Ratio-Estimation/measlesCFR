@@ -13,12 +13,12 @@
 #' @param vaccination_scenario An indicator to specify whether to estimate
 #' CFRs given vaccination (i.e. baseline) or no-vaccination scenario (options:
 #' “baseline”, “no_vaccination”). Default set to “baseline”.
-#' @param age_start The youngest single year of age at which to estimate
+#' @param start_age The youngest single year of age at which to estimate
 #' measles CFR. An integer value that is bounded between 0 and 100.
-#' ```age_start``` cannot be greater than ```age_end```.
-#' @param age_end The oldest single year of age at which to estimate measles
-#' CFR. An integer value that is bounded between 0 and 100. ```age_end``` cannot
-#' be less than ```age_start``.
+#' ```start_age``` cannot be greater than ```end_age```.
+#' @param end_age The oldest single year of age at which to estimate measles
+#' CFR. An integer value that is bounded between 0 and 100. ```end_age``` cannot
+#' be less than ```start_age``.
 #' @param year_start The start year to begin measles CFR estimation. An
 #' integer class value that is bounded between 1980 and 2100. ```year_start```
 #' cannot be greater than ```year_end```.
@@ -40,6 +40,22 @@
 #' CFR uncertainty interval. A numeric value bounded between 0 and 1.
 #' ```lower_bound``` cannot be greater than ```upper_bound```. Default set to
 #' 0.025.
+#'
+#' @examples
+#' # Predict CFRs with default covariates
+#' eth_cfr_default <- predictCFR(country="ETH")
+#' # Predict CFRs in the no-vaccination scenario with default covariates
+#' eth_cfr_default_novax <- predictCFR(country="ETH", vaccination_scenario = "no_vaccination")
+#' # Predict CFRs in a hospital setting with default covariates
+#' eth_cfr_default <- predictCFR(country="ETH", community_indicator=0)
+#' # Predict CFRs for years 2000 to 2030 with default covariates
+#' eth_cfr_default <- predictCFR(country="ETH", year_start=2000, year_end=2030)
+#' # Predict CFRs with user-specified covariates
+#' eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF)
+#' # Predict CFRs with user-specified covariates for ages 0 to 14
+#' eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, age_start=0, age_end=14)
+#' # Predict CFRs with user-specified covariates including all parameter set draws
+#' eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, get_draws=TRUE)
 #'
 #' @details The function returns estimated measles CFRs over time
 #' (by calendar year) from start_year to end_year according to the supplied
@@ -107,8 +123,8 @@
 #'      i <- countries[i0]
 #'      output <- predictCFR(country = i, inputDF = covariates,
 #'                           vaccination_scenario = “baseline”,
-#'                           start_age = 0, end_age = 4, year_start = 2000,
-#'                           year_end = 2030, community_indicator=1,
+#'                           start_age = 0, end_age = 4, start_year = 2000,
+#'                           end_year = 2030, community_indicator=1,
 #'                           get_draws = FALSE, upper_bound = 0.975,
 #'                           lower_bound = 0.025)
 #'      write.csv(output,paste0(directory,"output_",i,".csv"), row.names = FALSE)
@@ -129,8 +145,8 @@
 #' @export
 
 
-predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline', age_start = 0,
-                       age_end = 34, year_start = 1990, year_end = 2019, community_indicator = 1,
+predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline', start_age = 0,
+                       end_age = 34, start_year = 1990, end_year = 2019, community_indicator = 1,
                        get_draws = F, upper_bound = 0.975, lower_bound = 0.025) {
 
   ## ----------------------------------------------------------------------------------------------
@@ -153,15 +169,15 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
     covariates <- inputDF
   }
 
-  pred_frame <- subset(covariates, country == country_iso3 & year >= year_start & year <= year_end)
+  pred_frame <- subset(covariates, country == country_iso3 & year >= start_year & year <= end_year)
 
   # -----------------------------------------------------------------------------------------------
   # prepare prediction frame ----------------------------------------------------------------------
   pred_frame$Comm.ind <- community_indicator
 
-  pred_frame2 <- cbind(pred_frame, i = rep(age_start:age_end, each = nrow(pred_frame)))
-  pred_frame2$age_start <- pred_frame2$i
-  pred_frame2$age_end <- pred_frame2$i
+  pred_frame2 <- cbind(pred_frame, i = rep(start_age:end_age, each = nrow(pred_frame)))
+  pred_frame2$start_age <- pred_frame2$i
+  pred_frame2$end_age <- pred_frame2$i
 
   # -----------------------------------------------------------------------------------------------
   # make MR-BRT prediction object -----------------------------------------------------------------
@@ -169,8 +185,8 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
   data_pred$load_df(data=pred_frame2,
                     col_covs=list( "incidence_standardized",
                                    "maternal_education_standardized",
-                                   "age_start",
-                                   "age_end",
+                                   "start_age",
+                                   "end_age",
                                    "Comm.ind",
                                    "mcv1_standardized",
                                    "u5mr_standardized",
@@ -210,7 +226,7 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
 
   draws2$country <- pred_frame2$country
   draws2$year <- pred_frame2$year
-  draws2$age <- pred_frame2$age_start
+  draws2$age <- pred_frame2$start_age
   draws2$Comm.ind <- pred_frame2$Comm.ind
   draws2$predicted_cfr <- pred_frame2$mod_cfr
   draws2$predicted_cfr_ub <- pred_frame2$upper
@@ -222,7 +238,7 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
   pred_frame2$predicted_cfr_lb <- pred_frame2$lower
 
   pred_frame2$care_setting <- ifelse(pred_frame2$Comm.ind == 1, "community", "hospital")
-  pred_frame2$age <- pred_frame2$age_start
+  pred_frame2$age <- pred_frame2$start_age
 
   # -----------------------------------------------------------------------------------------------
   # to be returned --------------------------------------------------------------------------
@@ -232,8 +248,18 @@ predictCFR <- function(country, inputDF=NULL, vaccination_scenario = 'baseline',
   draws2 <- subset(draws2, select=c('country','age','year','care_setting','predicted_cfr', 'predicted_cfr_lb', 'predicted_cfr_ub', draw_cols))
 
   if (get_draws == T) {
-    return(draws2)
+    if(nrow(draws2) == 0) {
+      return("List returned is empty. You are possibly using an ISO3 country that is not low- or middle-income (you can see list of accepted countries with `listOfCountries()`.")
+    }
+    else {
+      return(draws2)
+    }
   } else {
-    return(pred_frame2)
+    if(nrow(pred_frame2) == 0) {
+      return("List returned is empty. You are possibly using an ISO3 country that is not low- or middle-income (you can see list of accepted countries with `listOfCountries()`.")
+    }
+    else {
+      return(pred_frame2)
+    }
   }
 }

@@ -8,10 +8,10 @@ predictCFR(
   country,
   inputDF = NULL,
   vaccination_scenario = "baseline",
-  age_start = 0,
-  age_end = 34,
-  year_start = 1990,
-  year_end = 2019,
+  start_age = 0,
+  end_age = 34,
+  start_year = 1990,
+  end_year = 2019,
   community_indicator = 1,
   get_draws = F,
   upper_bound = 0.975,
@@ -30,21 +30,13 @@ function that is long by calendar year and single year of age.}
 CFRs given vaccination (i.e. baseline) or no-vaccination scenario (options:
 “baseline”, “no_vaccination”). Default set to “baseline”.}
 
-\item{age_start}{The youngest single year of age at which to estimate
+\item{start_age}{The youngest single year of age at which to estimate
 measles CFR. An integer value that is bounded between 0 and 100.
-\code{age_start} cannot be greater than \code{age_end}.}
+\code{start_age} cannot be greater than \code{end_age}.}
 
-\item{age_end}{The oldest single year of age at which to estimate measles
-CFR. An integer value that is bounded between 0 and 100. \code{age_end} cannot
-be less than ```age_start``.}
-
-\item{year_start}{The start year to begin measles CFR estimation. An
-integer class value that is bounded between 1980 and 2100. \code{year_start}
-cannot be greater than \code{year_end}.}
-
-\item{year_end}{The end year through which to estimate measles CFR. An
-integer class value that is bounded between 1980 and 2100.
-\code{year_end} cannot be less than \code{year_start}.}
+\item{end_age}{The oldest single year of age at which to estimate measles
+CFR. An integer value that is bounded between 0 and 100. \code{end_age} cannot
+be less than ```start_age``.}
 
 \item{community_indicator}{An indicator to specify whether to estimate
 CFRs given a community or hospital setting (options: 1 for community,
@@ -64,6 +56,14 @@ CFR uncertainty interval. A numeric value bounded between 0 and 1.
 CFR uncertainty interval. A numeric value bounded between 0 and 1.
 \code{lower_bound} cannot be greater than \code{upper_bound}. Default set to
 0.025.}
+
+\item{year_start}{The start year to begin measles CFR estimation. An
+integer class value that is bounded between 1980 and 2100. \code{year_start}
+cannot be greater than \code{year_end}.}
+
+\item{year_end}{The end year through which to estimate measles CFR. An
+integer class value that is bounded between 1980 and 2100.
+\code{year_end} cannot be less than \code{year_start}.}
 }
 \value{
 A data frame of numeric class that is long by year and single
@@ -140,11 +140,28 @@ for (i0 in 1:length(countries)\{
      i <- countries[i0]
      output <- predictCFR(country = i, inputDF = covariates,
                           vaccination_scenario = “baseline”,
-                          start_age = 0, end_age = 4, year_start = 2000,
-                          year_end = 2030, community_indicator=1,
+                          start_age = 0, end_age = 4, start_year = 2000,
+                          end_year = 2030, community_indicator=1,
                           get_draws = FALSE, upper_bound = 0.975,
                           lower_bound = 0.025)
      write.csv(output,paste0(directory,"output_",i,".csv"), row.names = FALSE)
 \}
 }\if{html}{\out{</div>}}
+}
+\examples{
+# Predict CFRs with default covariates
+eth_cfr_default <- predictCFR(country="ETH")
+# Predict CFRs in the no-vaccination scenario with default covariates
+eth_cfr_default_novax <- predictCFR(country="ETH", vaccination_scenario = "no_vaccination")
+# Predict CFRs in a hospital setting with default covariates
+eth_cfr_default <- predictCFR(country="ETH", community_indicator=0)
+# Predict CFRs for years 2000 to 2030 with default covariates
+eth_cfr_default <- predictCFR(country="ETH", year_start=2000, year_end=2030)
+# Predict CFRs with user-specified covariates
+eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF)
+# Predict CFRs with user-specified covariates for ages 0 to 14
+eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, age_start=0, age_end=14)
+# Predict CFRs with user-specified covariates including all parameter set draws
+eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, get_draws=TRUE)
+
 }

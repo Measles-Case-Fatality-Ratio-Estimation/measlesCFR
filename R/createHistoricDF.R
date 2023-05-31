@@ -33,6 +33,16 @@
 #' sample range that the model was fit to. Please see below (Details section)
 #' for more information.
 #'
+#' @examples
+#' # Set local working directory; revise to location of input files
+#' setwd("E:/")
+#' # Load and save relevant input files to working environment
+#' eth_incidence <- read.csv("eth_incidence.csv",header=TRUE)
+#' eth_mcv1 <- read.csv("eth_mcv1.csv",header=TRUE)
+#' # Create historic DF with user-specified incidence and MCV1 coverage
+#' # All other covariates rely on package defaults
+#' eth_historicDF <- createHistoricDF(country="ETH", df_incidence=eth_incidence, df_mcv1=eth_mcv1)
+#'
 #' @details First, this function transforms each covariate according to the
 #' defined model fit in Sbarra, et al. (2023):
 #' * Untransformed: maternal education, MCV1 coverage, under-5 mortality rate,
@@ -269,6 +279,11 @@ createHistoricDF <- function(country, df_incidence=NULL, df_mcv1=NULL,
     historicDF <- merge(historicDF, df_incidence, by='year')
   }
 
-  return(historicDF)
+  if(nrow(historicDF) == 0) {
+    return("List returned is empty. You are possibly using an ISO3 country that is not low- or middle-income (you can see list of accepted countries with `listOfCountries()`.")
+  }
+  else {
+    return(historicDF)
+  }
 }
 

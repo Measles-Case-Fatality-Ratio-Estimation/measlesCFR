@@ -14,6 +14,12 @@
 #' covariate will be displayed in its own plot (i.e., six plots). If no inputDF
 #' is supplied, the function will rely on default covariate values.
 #'
+#' @examples
+#' # Examine default covariates
+#' displayCovariates(country="ETH")
+#' # Examine user-specified covariates
+#' displayCovariates(country="ETH", inputDF=eth_inputDF)
+#'
 #' @details The function returns the default covariate values over time
 #' (in calendar years) as a multi-panel plot object. If the user supplies an
 #' input data frame created by ```createInputDF()```, the function returns the
@@ -80,6 +86,10 @@ displayCovariates <- function(country, inputDF=NULL) {
 
   d <- subset(inputDF_original, select=c('year', 'vitA_deficiency', 'maternal_education', 'u5mr', 'mcv1', 'prop_urban', 'incidence'))
 
+  if(nrow(d) == 0) {
+    return("List returned is empty. You are possibly using an ISO3 country that is not low- or middle-income (you can see list of accepted countries with `listOfCountries()`.")
+  }
+
   d <- melt(d, id = c('year'))
 
   ## set max limits for lines
@@ -115,4 +125,5 @@ displayCovariates <- function(country, inputDF=NULL) {
     guides(color=guide_legend(title=""))
 
   return(gg_ctry)
+
 }

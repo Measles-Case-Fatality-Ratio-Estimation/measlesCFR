@@ -86,3 +86,14 @@ unstandardized covariate is as described below.\tabular{lrr}{
    Vitamin A deficiency prevalence \tab 0.0042 \tab 0.4820 \cr
 }
 }
+\examples{
+# Set local working directory; revise to location of input files
+setwd("E:/")
+# Load and save relevant input files to working environment
+eth_incidence <- read.csv("eth_incidence.csv",header=TRUE)
+eth_mcv1 <- read.csv("eth_mcv1.csv",header=TRUE)
+# Create historic DF with user-specified incidence and MCV1 coverage
+# All other covariates rely on package defaults
+eth_historicDF <- createHistoricDF(country="ETH", df_incidence=eth_incidence, df_mcv1=eth_mcv1)
+
+}

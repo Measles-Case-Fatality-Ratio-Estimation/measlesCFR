@@ -34,3 +34,10 @@ input data frame created by \code{createInputDF()}, the function returns the
 user-specified covariate values over time (in calendar years) as a
 multi-panel plot object.
 }
+\examples{
+# Examine default covariates
+displayCovariates(country="ETH")
+# Examine user-specified covariates
+displayCovariates(country="ETH", inputDF=eth_inputDF)
+
+}

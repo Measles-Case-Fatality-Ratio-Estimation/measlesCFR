@@ -61,3 +61,10 @@ frame created by \code{createHistoricDF()} and/or projection data frame
 created by \code{createProjectionDF()}, the function returns the combined
 data frame of the user-specified data frame objects.
 }
+\examples{
+# Create input DF with package defaults for years 2000 to 2030
+eth_inputDF_default <- createInputDF(country="ETH", start_year=2000, end_year=2030)
+# Create input DF with user-created historic DF and projection DF
+eth_inputDF <- createInputDF(country="ETH", historicDF=eth_historicDF, projectionDF=eth_projectionDF, historic_include=FALSE, projection_include=FALSE, vaccination_scenario="baseline", start_year=1980, end_year=2100)
+
+}

@@ -8,6 +8,13 @@
 #' ```predictCFR()``` function, or a list specified by the user in order to
 #' display a subset of years.
 #'
+#' @examples
+#' # Examine predicted CFRs using predictions based on default covariates
+#' # Rely on list of years generated through unique values in dataframe
+#' displayAgeCFR(predictDF=eth_cfr_default)
+#' # Examine predicted CFRs for years 2000 to 2030
+#' displayAgeCFR(predictDF=eth_cfr, list_of_years=c(seq(2000,2030,1))
+#'
 #' @details The function returns a multi-panel plot in which each year of age
 #' from start_age to end_age included in the ```predictCFR()``` object is
 #' graphed over calendar year. If no year_list is supplied, the function will

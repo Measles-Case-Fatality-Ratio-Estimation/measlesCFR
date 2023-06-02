@@ -1,7 +1,7 @@
 # Running the MeaslesCFR Package
 The measlesCFR package uses a Docker container. This ensures that all of the
 package dependencies are installed and that it will work on different operating
-systems (e.g. Windows, Mac). The Docker image hosted at: https://hub.docker.com/r/measlescasefatalityratio/measles_cfr
+systems (e.g., Windows, Mac). The Docker image is hosted at: https://hub.docker.com/r/measlescasefatalityratio/measles_cfr
 
 Below are the steps for running the package (steps modified from Reed Sorensen's "Health Metrics Toolbox":
 1. Install Docker Desktop from https://www.docker.com/products/docker-desktop.
@@ -22,15 +22,15 @@ Below are the steps for running the package (steps modified from Reed Sorensen's
 6. `reticulate::use_python("/opt/miniconda/envs/mrtool-0.1.0/bin/python")`
 7. `mrtool <- import("mrtool")`
 8. `library(measlesCFR)`
-9. Start using the package e.g. `predictCFR(country = "ETH")`
+9. Start using the package, e.g., `predictCFR(country = "ETH")`
 
 ## Additional Notes
 - Users can view accepted low- and middle-income ISO3 country codes by calling `listOfCountries()`.
 - Users can access the vignette with `vignette(“measles-vignette”,  package=”measlesCFR”)` after running the install steps.
-- Users can view the documentation for functions with `help(<function_name>)` e.g. `help(predictCFR)`. They can also view more information about the package in the measlesCFR.pdf in this repository.
+- Users can view the documentation for functions with `help(<function_name>)` e.g., `help(predictCFR)`. They can also view more information about the package in the measlesCFR.pdf in this repository.
 
 ## More Docker Information
-A Docker container is a computing environment contains everything needed to run an application (e.g. measlesCFR in an Rstudio session), including all the dependent libraries. A Docker container is an instance of a Docker image, which is created from a Dockerfile. The measlesCFR image is hosted on Docker Hub.
+A Docker container is a computing environment that contains everything needed to run an application (e.g., measlesCFR in an Rstudio session), including all the dependent libraries. A Docker container is an instance of a Docker image, which is created from a Dockerfile. The measlesCFR image is hosted on Docker Hub.
 
 Users can install other R packages in the Rstudio session that is launched by the Docker container, but they will need to re-install the packages whenever they restart the container.
 

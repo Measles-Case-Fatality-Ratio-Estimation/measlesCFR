@@ -26,7 +26,7 @@ Below are the steps for running the package (steps modified from Reed Sorensen's
 
 ## Additional Notes
 - Users can view accepted low- and middle-income ISO3 country codes by calling `listOfCountries()`.
-- Users can access the vignette with `vignette(“measles-vignette”,  package=”measlesCFR”)` after running the install steps.
+- Users can access the vignette with `vignette("measles-vignette",  package="measlesCFR")` after running the install steps.
 - Users can view the documentation for functions with `help(<function_name>)` e.g., `help(predictCFR)`. They can also view more information about the package in the measlesCFR.pdf in this repository.
 
 ## More Docker Information

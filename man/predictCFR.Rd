@@ -38,6 +38,14 @@ measles CFR. An integer value that is bounded between 0 and 100.
 CFR. An integer value that is bounded between 0 and 100. \code{end_age} cannot
 be less than ```start_age``.}
 
+\item{start_year}{The start year to begin measles CFR estimation. An
+integer class value that is bounded between 1980 and 2100. \code{start_year}
+cannot be greater than \code{end_year}.}
+
+\item{end_year}{The end year through which to estimate measles CFR. An
+integer class value that is bounded between 1980 and 2100.
+\code{end_year} cannot be less than \code{start_year}.}
+
 \item{community_indicator}{An indicator to specify whether to estimate
 CFRs given a community or hospital setting (options: 1 for community,
 0 for hospital). Default set to 1.}
@@ -56,14 +64,6 @@ CFR uncertainty interval. A numeric value bounded between 0 and 1.
 CFR uncertainty interval. A numeric value bounded between 0 and 1.
 \code{lower_bound} cannot be greater than \code{upper_bound}. Default set to
 0.025.}
-
-\item{year_start}{The start year to begin measles CFR estimation. An
-integer class value that is bounded between 1980 and 2100. \code{year_start}
-cannot be greater than \code{year_end}.}
-
-\item{year_end}{The end year through which to estimate measles CFR. An
-integer class value that is bounded between 1980 and 2100.
-\code{year_end} cannot be less than \code{year_start}.}
 }
 \value{
 A data frame of numeric class that is long by year and single
@@ -156,11 +156,11 @@ eth_cfr_default_novax <- predictCFR(country="ETH", vaccination_scenario = "no_va
 # Predict CFRs in a hospital setting with default covariates
 eth_cfr_default <- predictCFR(country="ETH", community_indicator=0)
 # Predict CFRs for years 2000 to 2030 with default covariates
-eth_cfr_default <- predictCFR(country="ETH", year_start=2000, year_end=2030)
+eth_cfr_default <- predictCFR(country="ETH", start_year=2000, end_year=2030)
 # Predict CFRs with user-specified covariates
 eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF)
 # Predict CFRs with user-specified covariates for ages 0 to 14
-eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, age_start=0, age_end=14)
+eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, start_age=0, end_age=14)
 # Predict CFRs with user-specified covariates including all parameter set draws
 eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, get_draws=TRUE)
 

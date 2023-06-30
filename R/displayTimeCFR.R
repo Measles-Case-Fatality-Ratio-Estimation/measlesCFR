@@ -1,7 +1,7 @@
 #' Display plots of measles case fatality rate over time (i.e., by calendar
 #' year).
 #'
-#' @description In a multi-panel plot, each calendar estimated with predictDF
+#' @description In a multi-panel plot, each calendar estimated with ```predictCFR()```
 #' is visually displayed by single year of age.
 #'
 #' @param predict_df Data frame object created by ```predictCFR()``` function.
@@ -12,9 +12,9 @@
 #' @examples
 #' # Examine predicted CFRs using predictions based on default covariates
 #' # Rely on list of ages generated through unique values in dataframe
-#' displayTimeCFR(predictDF=eth_cfr_default)
+#' displayTimeCFR(predict_df=eth_cfr_default)
 #' # Examine predicted CFRs for ages 0 to 14
-#' displayAgeCFR(predictDF=eth_cfr, list_of_ages=c(seq(0,14,1))
+#' displayAgeCFR(predict_df=eth_cfr, list_of_ages=c(seq(0,14,1))
 #'
 #' @details The function returns a multi-panel plot in which each calendar
 #' year from start_year to end_year included in the ```predictCFR()``` object

@@ -45,7 +45,7 @@
 #' eth_projectionDF <- createProjectionDF(country="ETH", df_incidence=eth_incidence_proj, df_mcv1=eth_mcv1_proj)
 #'
 #' @details First, this function transforms each covariate according to the
-#' defined model fit in Sbarra, et al. (2023).
+#' defined model fit in Sbarra, et al. (https://doi.org/10.1016/S2214-109X(23)00043-8).
 #'
 #' Second, this function standardizes the transformed covariates by subtracting
 #' the mean of the covariate and dividing by the standard deviation. Third, the

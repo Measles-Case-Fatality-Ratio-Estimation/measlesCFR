@@ -19,8 +19,8 @@ The plots are graphed over time (i.e., by calendar year) for the specified
 time period.
 }
 \description{
-In a multi-panel plot, each single year of age estimated with
-predictDF is visually displayed by calendar year.
+In a multi-panel plot, each single year of age estimated with \code{predictCFR()}
+is visually displayed by calendar year.
 }
 \details{
 The function returns a multi-panel plot in which each year of age
@@ -38,8 +38,8 @@ CFRs over time.
 \examples{
 # Examine predicted CFRs using predictions based on default covariates
 # Rely on list of years generated through unique values in dataframe
-displayAgeCFR(predictDF=eth_cfr_default)
+displayAgeCFR(predict_df=eth_cfr_default)
 # Examine predicted CFRs for years 2000 to 2030
-displayAgeCFR(predictDF=eth_cfr, list_of_years=c(seq(2000,2030,1))
+displayAgeCFR(predict_df=eth_cfr, list_of_years=c(seq(2000,2030,1))
 
 }

@@ -59,11 +59,12 @@ User provides inputs of measles incidence, measles-containing
 vaccine first-dose (MCV1) coverage, or other covariates for the historic
 period. The function will standardize the provided covariates, rely on
 default values for any covariates that are not user-specified, and return
-a data frame that is long by year and wide by covariates.
+a data frame that is long by year and wide by covariates. The historic data
+frame is bounded by the years 1980 to 2019.
 }
 \details{
 First, this function transforms each covariate according to the
-defined model fit in Sbarra, et al. (2023):
+defined model fit in Sbarra, et al. (https://doi.org/10.1016/S2214-109X(23)00043-8):
 \itemize{
 \item Untransformed: maternal education, MCV1 coverage, under-5 mortality rate,
 proportion living in urban setting, vitamin A deficiency prevalence
@@ -75,7 +76,7 @@ the mean of the covariate and dividing by the standard deviation. Third, the
 function returns a data frame that is long by year and wide by transformed,
 standardized covariates.
 
-Across all countries, the sample range for each untransformed,
+Across all countries, the bounds of the  sample range for each untransformed,
 unstandardized covariate is as described below.\tabular{lrr}{
    \strong{Covariate} \tab \strong{Minimum Value} \tab \strong{Maximum Value} \cr
    Measles incidence \tab 0.0000 \tab 0.1096 \cr
@@ -85,6 +86,10 @@ unstandardized covariate is as described below.\tabular{lrr}{
    Proportion living in urban setting \tab 0.0434 \tab 0.9120 \cr
    Vitamin A deficiency prevalence \tab 0.0042 \tab 0.4820 \cr
 }
+
+
+If the argument bound_sample_range is set to TRUE, the package will restrict
+user-specified covariate values to the above sample range.
 }
 \examples{
 # Set local working directory; revise to location of input files

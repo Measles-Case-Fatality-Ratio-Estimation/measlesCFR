@@ -53,7 +53,7 @@
 #' # Predict CFRs with user-specified covariates
 #' eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF)
 #' # Predict CFRs with user-specified covariates for ages 0 to 14
-#' eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, age_start=0, age_end=14)
+#' eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, start_age=0, end_age=14)
 #' # Predict CFRs with user-specified covariates including all parameter set draws
 #' eth_cfr <- predictCFR(country="ETH", inputDF=eth_inputDF, get_draws=TRUE)
 #'

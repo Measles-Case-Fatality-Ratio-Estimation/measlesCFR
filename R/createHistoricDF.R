@@ -4,7 +4,8 @@
 #' vaccine first-dose (MCV1) coverage, or other covariates for the historic
 #' period. The function will standardize the provided covariates, rely on
 #' default values for any covariates that are not user-specified, and return
-#' a data frame that is long by year and wide by covariates.
+#' a data frame that is long by year and wide by covariates. The historic data
+#' frame is bounded by the years 1980 to 2019.
 #'
 #' @param country The three-digit ISO3 code for the country in which to
 #' estimate measles CFRs. See Details for how to set this up as a loop
@@ -44,7 +45,7 @@
 #' eth_historicDF <- createHistoricDF(country="ETH", df_incidence=eth_incidence, df_mcv1=eth_mcv1)
 #'
 #' @details First, this function transforms each covariate according to the
-#' defined model fit in Sbarra, et al. (2023):
+#' defined model fit in Sbarra, et al. (https://doi.org/10.1016/S2214-109X(23)00043-8):
 #' * Untransformed: maternal education, MCV1 coverage, under-5 mortality rate,
 #' proportion living in urban setting, vitamin A deficiency prevalence
 #' * Logit transformed: measles incidence
@@ -54,7 +55,7 @@
 #' function returns a data frame that is long by year and wide by transformed,
 #' standardized covariates.
 #'
-#' Across all countries, the sample range for each untransformed,
+#' Across all countries, the bounds of the  sample range for each untransformed,
 #' unstandardized covariate is as described below.
 #'
 #'
@@ -66,6 +67,9 @@
 #' | Under-5 mortality rate (per 1000)   | 3.1                 | 341.2              |
 #' | Proportion living in urban setting  | 0.0434              | 0.9120             |
 #' | Vitamin A deficiency prevalence     | 0.0042              | 0.4820             |
+#'
+#' If the argument bound_sample_range is set to TRUE, the package will restrict
+#' user-specified covariate values to the above sample range.
 #'
 #' @md
 #'

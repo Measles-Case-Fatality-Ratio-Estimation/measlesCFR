@@ -19,7 +19,7 @@ A multi-panel plot of estimated measles CFR by calendar year. The
 plots are graphed by single year of age for the specified ages.
 }
 \description{
-In a multi-panel plot, each calendar estimated with predictDF
+In a multi-panel plot, each calendar estimated with \code{predictCFR()}
 is visually displayed by single year of age.
 }
 \details{
@@ -38,8 +38,8 @@ CFRs by age.
 \examples{
 # Examine predicted CFRs using predictions based on default covariates
 # Rely on list of ages generated through unique values in dataframe
-displayTimeCFR(predictDF=eth_cfr_default)
+displayTimeCFR(predict_df=eth_cfr_default)
 # Examine predicted CFRs for ages 0 to 14
-displayAgeCFR(predictDF=eth_cfr, list_of_ages=c(seq(0,14,1))
+displayAgeCFR(predict_df=eth_cfr, list_of_ages=c(seq(0,14,1))
 
 }

@@ -14,6 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Description
+The following vignette presents a system for estimating measles case fatality ratios (CFRs) at the country, year, and age level for low- and middle-income countries. Users can inform covariate predictors in both/either the historic or future time periods, and the package will provide the resulting measles CFR estimates. For more detail on package functions, please view the package documentation in the measlesCFR.pdf in the GitHub repository.
+
 ## Installing
 ```{r setup}
 library(reticulate)
@@ -37,7 +40,7 @@ localDF <- read.csv('localDF.csv',header=TRUE)
 With this CSV file, the user can specify any/all covariate values to differentiate from default  package values. For example:
 
 ```{r eval=FALSE}
-userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_incidence = localDF[,c('year','incidence_standardized')], df_mcv1 = localDF[,c('year","mcv1_standardized')], df_maternal_education = localDF[,c('year','maternal_education_standardized')], df_u5mr = localDF[,c('year','u5mr_standardized')], df_prop_urban = localDF[,c('year","prop_urban_standardized')], df_vitA = localDF[,c('year","vitA_standardized')])
+userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_incidence = localDF[,c('year','incidence')], df_mcv1 = localDF[,c('year','mcv1')], df_maternal_education = localDF[,c('year','maternal_education')], df_u5mr = localDF[,c('year','u5mr')], df_prop_urban = localDF[,c('year','prop_urban')], df_vitA = localDF[,c('year','vitA')])
 ```
 
 Note the covariate names may differ in your local CSV file, adjust accordingly.
@@ -64,7 +67,7 @@ Note Step 3 currently relies on default values. In order to rely on user-specifi
 
 ```{r eval=FALSE}
 userSpecifiedInputDF <- createInputDF(country = 'AFG',
-                                      historic = userSpecifiedHistoricDF, 
+                                      historicDF = userSpecifiedHistoricDF, 
                                       projectionDF = userSpecifiedProjectionDF,
                                       historic_include=T,
                                       projection_include=T,
@@ -151,7 +154,7 @@ The output of ```displayTimeCFR()``` is a multi-panel ggplot object. The covaria
 
 
 ## Final
-The ```predictCFR()``` function in Step 5 will return estimated measles CFRs for a single country, defined by the supplied three-digit ISO3 code for the country in which to estimate measles CFRs. In order to set up a loop to return estimates across multiple countries, the user must first save a vector of ISO3 codes for the countries of interest as a CSV file, see Details in package documentation.
+The ```predictCFR()``` function in Step 5 will return estimated measles CFRs for a single country, defined by the supplied three-digit ISO3 code for the country in which to estimate measles CFRs. In order to set up a loop to return estimates across multiple countries, the user must first save a vector of ISO3 codes for the countries of interest either as a CSV file or created within the R environment, as a CSV file, see Details in package documentation.
 
 From your working directory, load your dataframe as a CSV file into your R environment:
 
@@ -159,22 +162,19 @@ From your working directory, load your dataframe as a CSV file into your R envir
 countries <- read.csv("LMIC_codes.csv",header=TRUE)
 ```
 
-Run the measlesCFR package as a loop per the following code, revising your inputs and arguments accordingly. This example loops through the above countries for children ages 0 to 4 from years 2000 to 2030, assuming community-based cases given a vaccination program, returning only the mean, upper bound (0.975 percentile), and lower bound (0.025 percentile) estimates.
+Run the measlesCFR package as a loop per the following code, revising your inputs and arguments accordingly. This example loops through the above countries for children ages 0 to 4 from years 2000 to 2030, assuming community-based cases given a vaccination program, returning only the mean, upper bound (0.975 percentile), and lower bound (0.025 percentile) estimates. This example relies on the package defaults for the 'inputDF' argument (i.e., this argument is not specified), but the 'inputDF' argument should be used to specify the object created by the inputDF() function otherwise.
 
 ```{r eval=FALSE}
 ## your file path
 directory <- 'C:/'
 setwd(directory)
-## your inputDF object
-covariates <- inputDF()
 
-for (i0 in 1:length(countries){
+for (i0 in 1:length(countries)) {
 
 	i <- countries[i0]
 
 	output <- predictCFR(country = i,
-	                     inputDF = covariates,
-	                     vaccination_scenario = “baseline”,
+	                     vaccination_scenario = 'baseline',
 	                     age_start = 0,
 	                     age_end = 4,
 	                     start_year = 2000,

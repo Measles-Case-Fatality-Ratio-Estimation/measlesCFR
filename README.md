@@ -21,7 +21,7 @@ Below are the steps for running the package (steps modified from Reed Sorensen's
     files at /path/to/local/directory by instead referring to /mnt. For people using Windows,
     note that the usual Windows file path will need to be modified slightly. For example,
     C:\Users\myname\data would need to be converted to //C/Users/myname/data.
-    - For example: On a Windows machine a user could run `docker run -v //C/Users/<username>/Desktop:/mnt --rm -p 8787:8787 -e ROOT=TRUE -e PASSWORD=dockpass measles_cfr`. Users could then save to their Desktop by referencing mnt. E.g. `save(data, file = "/mnt/dataframe.Rdata` would save the dataframe object to a file called "dataframe.Rdata" on the user's Desktop.
+    - For example: On a Windows machine a user could run `docker run -v //C/Users/<username>/Desktop:/mnt --rm -p 8787:8787 -e ROOT=TRUE -e PASSWORD=dockpass measles_cfr`. Users could then save to their Desktop by referencing mnt. E.g. `save(data, file = ":/mnt/dataframe.Rdata` would save the dataframe object to a file called "dataframe.Rdata" on the user's Desktop.
 4. In a browser, go to localhost:8787. Enter user name “rstudio” and password “dockpass”.
   - Step 4 will open a virtual session of Rstudio. Subsequent steps will be completed in Rstudio.
 5. `library(reticulate)`

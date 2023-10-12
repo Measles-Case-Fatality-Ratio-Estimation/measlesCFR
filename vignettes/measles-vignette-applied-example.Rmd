@@ -1,0 +1,925 @@
+---
+title: "measles-vignette-applied-example"
+author: "Allison Portnoy"
+date: "2023-09-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# measlesCFR vignette applied example
+
+## Description
+Previously published evidence has demonstrated that the outcome of infection and consequences of infection, such as case-fatality ratios (CFRs), can depend on health system burden [1-7] rather than remaining independent of health system characteristics. The COVID-19 pandemic disrupted routine health services that are critical to the prevention of morbidity and mortality in many low- and middle-income countries (LMICs) around the world, with routine immunization coverage droppings to levels not seen since 1990 in some settings [8-10]. Immunization coverage often declined most notably in the places where other health services also suffered, highlighting that vaccination coverage is associated with the quality of and access to a health system [11]. Several modeling studies have shown the detrimental impact that essential health service disruptions could have on the burden of vaccine-preventable [12, 13] and other [14-16] diseases. Beyond vaccination coverage, the COVID-19 pandemic also led to changes in other underlying drivers of case fatality, such as nutritional status [17] and health system quality and access [18], which support the hypothesis that the COVID-19 pandemic could have impacted case fatality of other diseases in 2020 and 2021.
+
+Leveraging the ```measlesCFR()``` package, this applied example demonstrates an estimation of the potential impact of the COVID-19 pandemic on measles case fatality.
+
+## Analytic scenarios
+We assessed which previously determined drivers of measles CFR were likely to have experienced a pandemic “shock” in value. For each analyzed covariate, we assumed a set of alternative “shocks” due to the pandemic applied in years 2020 and 2021. 
+
+In the base-case, we assumed published WHO/UNICEF estimates of national immunization coverage (WUENIC) for MCV1 coverage in 2020 and 2021 and 2019 levels were held constant for under-five mortality rate and vitamin A deficiency in 2020 and 2021 [23,24].
+
+We examined two alternative scenarios for the pandemic “shock” to MCV1 coverage, assuming that WUENIC estimates in 2019 decreased by 10% or by 5% in 2020 and 2021. Relying on a published study on health service utilization data between January 2018 to June 2021 in 18 LMICs [18], we examined two alternative scenarios for the potential pandemic “shock” to under-five mortality rate in 2020 and 2021: a 14.9% increase (i.e., the maximum mortality increase among children aged 0–59 months out of 18 LMICs) and a 3.6% increase (i.e., the mean mortality increase among children aged 0–59 months across 18 LMICs). A full list of analytic scenarios is provided in Table 1. As vitamin A deficiency is, in part, a proxy for nutritional status in the measles CFR meta-regression model, we relied on published estimates for the potential increase in moderate/severe wasting for 104 LMICs as a proxy for vitamin A deficiency [24]. We examined three alternative scenarios for the potential pandemic “shock” to vitamin A deficiency in 2020 and 2021: a 26.6% increase (i.e., the greatest estimated increase in wasting prevalence), a 17.47% increase (i.e., the mean estimated increase in wasting prevalence), and a 6.25% increase (i.e., the smallest estimated increase in wasting prevalence) [25].
+
+## Table 1. Analytic scenarios.
+
+| Covariate(s)  | Pandemic “shock” applied in year 2020 + 2021 |Source|
+| ------------- |:-------------:|:-------------:|
+| MCV1 coverage     | Base: WUENIC<br>Scenario 1: -10%<br>Scenario 2: -5%     | [24]; Assumption |
+| Under-5 mortality rate (U5MR)      | Base: 2019 levels<br>Scenario 1: +14.9%<br>Scenario 2: +3.6%    | [18,23] |
+| Vitamin A (VitA) deficiency      | Base: 2019 levels<br>Scenario 1: +26.6%<br>Scenario 2: +17.47%<br>Scenario 3: +6.25%     | [25] |
+|MCV1 + U5MR + VitA | MCV1: -10%<br>U5MR: +14.9%<br>VitA: +26.6% | [18, 23, 24]|
+##### Note: MCV1 = measles-containing-vaccine first dose; WUENIC = WHO/UNICEF estimates of national immunization coverage. 
+
+All scenarios were projected from years 2019 to 2030. We projected linear trends for the length of time (in years) for covariate values to return to pre-pandemic (i.e., 2019) levels in 133 LMICs. We examined three alternative assumptions for this length of time: one, three, and five years.
+
+## Running scenario in measlesCFR package
+### Step 1: historic dataframe
+
+This applied examples includes the year 2019 from the historic period. In order to specify alternative covariate values, prior to Step 1, set working directory, i.e., setwd(‘local file path’), to the local file path with the CSV dataframe file of covariate values being used, which should be long by year and wide by covariates. In this case, we want to run the list of 24 analytic scenarios listed in Table 1. We can create a loop to load the individual CSV files into the R environment, and specify the relevant covariate values to differentiate from the default package values accordingly. The following takes in input files with multiple countries and subsets to AFG, but an example with an outer loop to estimate across multiple countries is included in the Final step.
+
+```{r eval=FALSE}
+scenarios <- c("MCV1-10%-1y","MCV1-10%-3y","MCV1-10%-5y","MCV1-5%-1y","MCV1-5%-3y","MCV1-5%-5y","MCV1-Base","U5MR-14.9%-1y","U5MR-14.9%-3y","U5MR-14.9%-5y","U5MR-3.6%-1y","U5MR-3.6%-3y","U5MR-3.6%-5y","U5MR-Base","VitA-17.47%-1y","VitA-17.47%-3y","VitA-17.47%-5y","VitA-26.6%-1y","VitA-26.6%-3y","VitA-26.6%-5y","VitA-6.25%-1y","VitA-6.25%-3y","VitA-6.25%-5y","VitA-Base")
+
+for (i0 in 1:length(scenarios)) {
+  
+  i <- scenarios[i0]
+  
+  if (grepl("MCV1",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localhistoricDF[,c('year','mcv1')])
+    
+  }
+  
+  if (grepl("U5MR",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_u5mr = localhistoricDF[,c('year','u5mr')])
+    
+  }
+  
+  if (grepl("VitA",i)==TRUE) {
+  
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_vitA = localhistoricDF[,c('year','vitA')])
+    
+  }
+
+}
+```
+
+Note that the date range for predictions is limited to the year(s) provided for covariate values. In this case, we only specified the year 2019 for the historic dataframe, so ```predictCFR()``` can only provide measles CFR estimates for 2019. See Details for ```createHistoricDF()``` in the package documentation.
+
+### Step 2
+We can follow the same approach for the projection dataframe in Step 2 that we used for the historic dataframe in Step 1. In this case, years 2020-2030 are specified in the input projection dataframes, so ```predictCFR()``` can only provide measles CFR estimates for 2020-2030. We can add the ```createProjectionDF()``` function to the loop set up in Step 1 per the following code block.
+
+```{r}
+scenarios <- c("MCV1-10%-1y","MCV1-10%-3y","MCV1-10%-5y","MCV1-5%-1y","MCV1-5%-3y","MCV1-5%-5y","MCV1-Base","U5MR-14.9%-1y","U5MR-14.9%-3y","U5MR-14.9%-5y","U5MR-3.6%-1y","U5MR-3.6%-3y","U5MR-3.6%-5y","U5MR-Base","VitA-17.47%-1y","VitA-17.47%-3y","VitA-17.47%-5y","VitA-26.6%-1y","VitA-26.6%-3y","VitA-26.6%-5y","VitA-6.25%-1y","VitA-6.25%-3y","VitA-6.25%-5y","VitA-Base")
+
+for (i0 in 1:length(scenarios)) {
+  
+  i <- scenarios[i0]
+  
+  if (grepl("MCV1",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localhistoricDF[,c('year','mcv1')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localprojectionDF[,c('year','mcv1')])
+    
+  }
+  
+  if (grepl("U5MR",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_u5mr = localhistoricDF[,c('year','u5mr')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_u5mr = localprojectionDF[,c('year','u5mr')])
+    
+  }
+  
+  if (grepl("VitA",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_vitA = localhistoricDF[,c('year','vitA')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_vitA = localprojectionDF[,c('year','vitA')])
+    
+  }
+
+}
+```
+
+### Step 3
+In order to rely on user-specified data.frame object(s) created in Steps 1 and 2, we need to load the data.frame objects from the local environment into the ```createInputDF()``` function. We can also add this step as part of the same scenario loop per the following code block.
+
+```{r eval=FALSE}
+scenarios <- c("MCV1-10%-1y","MCV1-10%-3y","MCV1-10%-5y","MCV1-5%-1y","MCV1-5%-3y","MCV1-5%-5y","MCV1-Base","U5MR-14.9%-1y","U5MR-14.9%-3y","U5MR-14.9%-5y","U5MR-3.6%-1y","U5MR-3.6%-3y","U5MR-3.6%-5y","U5MR-Base","VitA-17.47%-1y","VitA-17.47%-3y","VitA-17.47%-5y","VitA-26.6%-1y","VitA-26.6%-3y","VitA-26.6%-5y","VitA-6.25%-1y","VitA-6.25%-3y","VitA-6.25%-5y","VitA-Base")
+
+for (i0 in 1:length(scenarios)) {
+  
+  i <- scenarios[i0]
+  
+  if (grepl("MCV1",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localhistoricDF[,c('year','mcv1')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localprojectionDF[,c('year','mcv1')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+  
+  }
+  
+  if (grepl("U5MR",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_u5mr = localhistoricDF[,c('year','u5mr')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_u5mr = localprojectionDF[,c('year','u5mr')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+  }
+  
+  if (grepl("VitA",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_vitA = localhistoricDF[,c('year','vitA')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_vitA = localprojectionDF[,c('year','vitA')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+  }
+
+}
+```
+
+Note that 'projection_include' must be set to TRUE to include the projection period in CFR estimation. Note that the date range for predictions is limited to 2019-2030 as the years provided for covariate values.
+
+### Step 4
+In order to ensure trends match expectations and compare to the covariate sample range, we can use the ```displayCovariates()``` function is intended to visualize a multi-panel ggplot object of covariate values. The previously specified input data.frame object must be included as an argument, and the output can be saved to local files within our loop per the following code block.
+
+```{r eval=FALSE}
+scenarios <- c("MCV1-10%-1y","MCV1-10%-3y","MCV1-10%-5y","MCV1-5%-1y","MCV1-5%-3y","MCV1-5%-5y","MCV1-Base","U5MR-14.9%-1y","U5MR-14.9%-3y","U5MR-14.9%-5y","U5MR-3.6%-1y","U5MR-3.6%-3y","U5MR-3.6%-5y","U5MR-Base","VitA-17.47%-1y","VitA-17.47%-3y","VitA-17.47%-5y","VitA-26.6%-1y","VitA-26.6%-3y","VitA-26.6%-5y","VitA-6.25%-1y","VitA-6.25%-3y","VitA-6.25%-5y","VitA-Base")
+
+for (i0 in 1:length(scenarios)) {
+  
+  i <- scenarios[i0]
+  
+  if (grepl("MCV1",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localhistoricDF[,c('year','mcv1')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localprojectionDF[,c('year','mcv1')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+  
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+  }
+  
+  if (grepl("U5MR",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_u5mr = localhistoricDF[,c('year','u5mr')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_u5mr = localprojectionDF[,c('year','u5mr')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+  }
+  
+  if (grepl("VitA",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_vitA = localhistoricDF[,c('year','vitA')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_vitA = localprojectionDF[,c('year','vitA')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+  }
+
+}
+```
+
+### Step 5
+In order to estimate measles CFRs relying on our user-specified data.frame objects created in Step 3, we can load the object from our local environment into the ```predictCFR()``` function within our loop per the following code block.
+
+```{r eval=FALSE}
+scenarios <- c("MCV1-10%-1y","MCV1-10%-3y","MCV1-10%-5y","MCV1-5%-1y","MCV1-5%-3y","MCV1-5%-5y","MCV1-Base","U5MR-14.9%-1y","U5MR-14.9%-3y","U5MR-14.9%-5y","U5MR-3.6%-1y","U5MR-3.6%-3y","U5MR-3.6%-5y","U5MR-Base","VitA-17.47%-1y","VitA-17.47%-3y","VitA-17.47%-5y","VitA-26.6%-1y","VitA-26.6%-3y","VitA-26.6%-5y","VitA-6.25%-1y","VitA-6.25%-3y","VitA-6.25%-5y","VitA-Base")
+
+for (i0 in 1:length(scenarios)) {
+  
+  i <- scenarios[i0]
+  
+  if (grepl("MCV1",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localhistoricDF[,c('year','mcv1')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localprojectionDF[,c('year','mcv1')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+  
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+  }
+  
+  if (grepl("U5MR",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_u5mr = localhistoricDF[,c('year','u5mr')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_u5mr = localprojectionDF[,c('year','u5mr')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+  }
+  
+  if (grepl("VitA",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_vitA = localhistoricDF[,c('year','vitA')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_vitA = localprojectionDF[,c('year','vitA')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+  }
+
+}
+```
+
+Note that Step 5 currently outputs predicted CFR for ages 0-34 and years 2019-2030 in the context of a vaccination program for community-based measles cases, i.e., community_indicator = 1. The above code block includes writing out the CSV file of CFR predictions to local files.
+
+### Step 6
+In order to visualize CFRs by age in a multi-panel ggplot object, we can load the output from the ```predictCFR()``` function in the ```displayAgeCFR()``` function, and save the visualization to local files per the following code block. The PNG file AFG_VitA-26.6%-5y_displayAgeCFR shows an example plot for the Vitamin A 26.6% 5-year scenario in Afghanistan.
+
+```{r}
+scenarios <- c("MCV1-10%-1y","MCV1-10%-3y","MCV1-10%-5y","MCV1-5%-1y","MCV1-5%-3y","MCV1-5%-5y","MCV1-Base","U5MR-14.9%-1y","U5MR-14.9%-3y","U5MR-14.9%-5y","U5MR-3.6%-1y","U5MR-3.6%-3y","U5MR-3.6%-5y","U5MR-Base","VitA-17.47%-1y","VitA-17.47%-3y","VitA-17.47%-5y","VitA-26.6%-1y","VitA-26.6%-3y","VitA-26.6%-5y","VitA-6.25%-1y","VitA-6.25%-3y","VitA-6.25%-5y","VitA-Base")
+
+for (i0 in 1:length(scenarios)) {
+  
+  i <- scenarios[i0]
+  
+  if (grepl("MCV1",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localhistoricDF[,c('year','mcv1')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localprojectionDF[,c('year','mcv1')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+  
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+    setwd("./Age visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+    dev.off()
+    
+  }
+  
+  if (grepl("U5MR",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_u5mr = localhistoricDF[,c('year','u5mr')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_u5mr = localprojectionDF[,c('year','u5mr')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+    setwd("./Age visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+    dev.off()
+    
+  }
+  
+  if (grepl("VitA",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_vitA = localhistoricDF[,c('year','vitA')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_vitA = localprojectionDF[,c('year','vitA')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+    setwd("./Age visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+    dev.off()
+    
+  }
+
+}
+```
+
+### Step 7
+In order to visualize CFRs by year in a multi-panel ggplot object, we can load the output from the ```predictCFR()``` function in the ```displayTimeCFR()``` function, and save the visualization to local files per the following code block. The PNG file AFG_VitA-26.6%-5y_displayTimeCFR shows an example plot for the Vitamin A 26.6% 5-year scenario in Afghanistan.
+
+```{r}
+scenarios <- c("MCV1-10%-1y","MCV1-10%-3y","MCV1-10%-5y","MCV1-5%-1y","MCV1-5%-3y","MCV1-5%-5y","MCV1-Base","U5MR-14.9%-1y","U5MR-14.9%-3y","U5MR-14.9%-5y","U5MR-3.6%-1y","U5MR-3.6%-3y","U5MR-3.6%-5y","U5MR-Base","VitA-17.47%-1y","VitA-17.47%-3y","VitA-17.47%-5y","VitA-26.6%-1y","VitA-26.6%-3y","VitA-26.6%-5y","VitA-6.25%-1y","VitA-6.25%-3y","VitA-6.25%-5y","VitA-Base")
+
+for (i0 in 1:length(scenarios)) {
+  
+  i <- scenarios[i0]
+  
+  if (grepl("MCV1",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localhistoricDF[,c('year','mcv1')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_mcv1 = localprojectionDF[,c('year','mcv1')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+  
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+    setwd("./Age visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+    dev.off()
+    
+    setwd("./Year visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayTimeCFR(predict_df = userGeneratedPredictCFR, list_of_ages = c(0,1,2,3,4)))
+    dev.off()
+    
+  }
+  
+  if (grepl("U5MR",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_u5mr = localhistoricDF[,c('year','u5mr')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_u5mr = localprojectionDF[,c('year','u5mr')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+    setwd("./Age visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+    dev.off()
+    
+    setwd("./Year visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayTimeCFR(predict_df = userGeneratedPredictCFR, list_of_ages = c(0,1,2,3,4)))
+    dev.off()
+    
+  }
+  
+  if (grepl("VitA",i)==TRUE) {
+    
+    setwd("./CSV files for year 2019")
+    
+    localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localhistoricDF <- subset(localhistoricDF,localhistoricDF$country=='AFG')
+    
+    setwd("./CSV files for year 2020-2030")
+    
+    localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+    
+    localprojectionDF <- subset(localprojectionDF,localprojectionDF$country=='AFG')
+    
+    userSpecifiedHistoricDF <- createHistoricDF(country = 'AFG', bound_sample_range = F, df_vitA = localhistoricDF[,c('year','vitA')])
+    
+    userSpecifiedProjectionDF <- createProjectionDF(country = 'AFG', bound_sample_range = F, df_vitA = localprojectionDF[,c('year','vitA')])
+    
+    userSpecifiedInputDF <- createInputDF(country = 'AFG',historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+    
+    setwd("./Covariate visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayCovariates(country = 'AFG', inputDF = userSpecifiedInputDF))
+    dev.off()
+    
+    setwd("./Predicted CFRs")
+    
+    userGeneratedPredictCFR <- predictCFR(country = 'AFG',inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+    write.csv(userGeneratedPredictCFR,paste0(i,'.csv'),row.names=FALSE)
+    
+    setwd("./Age visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+    dev.off()
+    
+    setwd("./Year visualizations")
+    
+    png(paste0(i,'.png'))
+    print(displayTimeCFR(predict_df = userGeneratedPredictCFR, list_of_ages = c(0,1,2,3,4)))
+    dev.off()
+    
+  }
+
+}
+```
+
+### Final
+This applied example shows how to use the ```predictCFR()``` function for a single country, Afghanistan, defined by its three-digit ISO3 code, AFG. In order to set up a loop to return estimates across multiple countries, we can first save a vector of ISO3 codes for the countries of interest as a list in the R environment and then add an outer loop to loop through countries as well as scenarios per the following code block.
+
+```{r eval=FALSE}
+scenarios <- c("MCV1-10%-1y","MCV1-10%-3y","MCV1-10%-5y","MCV1-5%-1y","MCV1-5%-3y","MCV1-5%-5y","MCV1-Base","U5MR-14.9%-1y","U5MR-14.9%-3y","U5MR-14.9%-5y","U5MR-3.6%-1y","U5MR-3.6%-3y","U5MR-3.6%-5y","U5MR-Base","VitA-17.47%-1y","VitA-17.47%-3y","VitA-17.47%-5y","VitA-26.6%-1y","VitA-26.6%-3y","VitA-26.6%-5y","VitA-6.25%-1y","VitA-6.25%-3y","VitA-6.25%-5y","VitA-Base")
+
+countries <- c("AFG","AGO","ALB","ARG","ARM","AZE","BDI","BEN","BFA","BGD","BGR","BIH","BLR","BLZ","BOL","BRA","BTN","BWA","CAF",
+               "CHN","CIV","CMR","COD","COG","COL","COM","CPV","CRI","CUB","DJI","DMA","DOM","DZA","ECU","EGY","ERI","ETH","FJI",
+               "FSM","GAB","GEO","GHA","GIN","GMB","GNB","GNQ","GRD","GTM","GUY","HND","HTI","IDN","IND","IRN","IRQ","JAM","JOR",
+               "KAZ","KEN","KGZ","KHM","KIR","LAO","LBN","LBR","LBY","LCA","LKA","LSO","MAR","MDA","MDG","MDV","MEX","MHL","MKD",
+               "MLI","MMR","MNE","MNG","MOZ","MRT","MWI","MYS","NAM","NER","NGA","NIC","NPL","PAK","PER","PHL","PNG","PRK","PRY",
+               "PSE","RUS","RWA","SDN","SEN","SLB","SLE","SLV","SOM","SRB","SSD","STP","SUR","SWZ","SYR","TCD","TGO","THA","TJK",
+               "TKM","TLS","TON","TUN","TUR","TUV","TZA","UGA","UKR","UZB","VCT","VEN","VNM","VUT","WSM","YEM","ZAF","ZMB","ZWE")
+
+for (j0 in 1:length(countries)) {
+  
+  j <- countries[j0]
+  
+  for (i0 in 1:length(scenarios)) {
+    
+    i <- scenarios[i0]
+    
+    if (grepl("MCV1",i)==TRUE) {
+      
+      setwd("./CSV files for year 2019")
+      
+      localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+      
+      localhistoricDF <- subset(localhistoricDF,localhistoricDF$country==j)
+      
+      setwd("./CSV files for year 2020-2030")
+      
+      localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+      
+      localprojectionDF <- subset(localprojectionDF,localprojectionDF$country==j)
+      
+      userSpecifiedHistoricDF <- createHistoricDF(country = j, bound_sample_range = F, df_mcv1 = localhistoricDF[,c('year','mcv1')])
+      
+      userSpecifiedProjectionDF <- createProjectionDF(country = j, bound_sample_range = F, df_mcv1 = localprojectionDF[,c('year','mcv1')])
+      
+      userSpecifiedInputDF <- createInputDF(country = j,historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+      
+      setwd("./Covariate visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayCovariates(country = j, inputDF = userSpecifiedInputDF))
+      dev.off()
+      
+      setwd("./Predicted CFRs")
+      
+      userGeneratedPredictCFR <- predictCFR(country = j,inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+      write.csv(userGeneratedPredictCFR,paste0(j,'_',i,'.csv'),row.names=FALSE)
+      
+      setwd("./Age visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+      dev.off()
+      
+      setwd("./Year visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayTimeCFR(predict_df = userGeneratedPredictCFR, list_of_ages = c(0,1,2,3,4)))
+      dev.off()
+      
+    }
+    
+    if (grepl("U5MR",i)==TRUE) {
+      
+      setwd("./CSV files for year 2019")
+      
+      localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+      
+      localhistoricDF <- subset(localhistoricDF,localhistoricDF$country==j)
+      
+      setwd("./CSV files for year 2020-2030")
+      
+      localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+      
+      localprojectionDF <- subset(localprojectionDF,localprojectionDF$country==j)
+      
+      userSpecifiedHistoricDF <- createHistoricDF(country = j, bound_sample_range = F, df_u5mr = localhistoricDF[,c('year','u5mr')])
+      
+      userSpecifiedProjectionDF <- createProjectionDF(country = j, bound_sample_range = F, df_u5mr = localprojectionDF[,c('year','u5mr')])
+      
+      userSpecifiedInputDF <- createInputDF(country = j,historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+      
+      setwd("./Covariate visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayCovariates(country = j, inputDF = userSpecifiedInputDF))
+      dev.off()
+      
+      setwd("./Predicted CFRs")
+      
+      userGeneratedPredictCFR <- predictCFR(country = j,inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+      write.csv(userGeneratedPredictCFR,paste0(j,'_',i,'.csv'),row.names=FALSE)
+      
+      setwd("./Age visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+      dev.off()
+      
+      setwd("./Year visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayTimeCFR(predict_df = userGeneratedPredictCFR, list_of_ages = c(0,1,2,3,4)))
+      dev.off()
+      
+    }
+    
+    if (grepl("VitA",i)==TRUE) {
+      
+      setwd("./CSV files for year 2019")
+      
+      localhistoricDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+      
+      localhistoricDF <- subset(localhistoricDF,localhistoricDF$country==j)
+      
+      setwd("./CSV files for year 2020-2030")
+      
+      localprojectionDF <- read.csv(paste0(i,'.csv'),header=TRUE)
+      
+      localprojectionDF <- subset(localprojectionDF,localprojectionDF$country==j)
+      
+      userSpecifiedHistoricDF <- createHistoricDF(country = j, bound_sample_range = F, df_vitA = localhistoricDF[,c('year','vitA')])
+      
+      userSpecifiedProjectionDF <- createProjectionDF(country = j, bound_sample_range = F, df_vitA = localprojectionDF[,c('year','vitA')])
+      
+      userSpecifiedInputDF <- createInputDF(country = j,historicDF = userSpecifiedHistoricDF,projectionDF = userSpecifiedProjectionDF,historic_include=T,projection_include=T,vaccination_scenario='baseline',start_year=2019,end_year=2030)
+      
+      setwd("./Covariate visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayCovariates(country = j, inputDF = userSpecifiedInputDF))
+      dev.off()
+      
+      setwd("./Predicted CFRs")
+      
+      userGeneratedPredictCFR <- predictCFR(country = j,inputDF = userSpecifiedInputDF,vaccination_scenario = 'baseline',start_age = 0,end_age = 34, start_year = 2019, end_year = 2030, community_indicator = 1, get_draws = F, upper_bound = 0.975, lower_bound = 0.025)
+      write.csv(userGeneratedPredictCFR,paste0(j,'_',i,'.csv'),row.names=FALSE)
+      
+      setwd("./Age visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayAgeCFR(predict_df = userGeneratedPredictCFR, list_of_years = c(2019,2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030)))
+      dev.off()
+      
+      setwd("./Year visualizations")
+      
+      png(paste0(j,'_',i,'.png'))
+      print(displayTimeCFR(predict_df = userGeneratedPredictCFR, list_of_ages = c(0,1,2,3,4)))
+      dev.off()
+      
+    }
+    
+  }
+  
+}               
+```
+
+## References
+
+1.	Clarke KEN, MacNeil A, Hadler S, Scott C, Tiwari TSP, Cherian T. Global Epidemiology of Diphtheria, 2000–2017. Emerg Infect Dis 2019, 25(10):1834.
+2.	Jansen KU, Knirsch C, Anderson AS. The role of vaccines in preventing bacterial antimicrobial resistance. Nat Med 2018, 24(1):10-19.
+3.	Lartey BL, Damanka S, Dennis FE, Enweronu-Laryea CC, Addo-Yobo E, Ansong D, Kwarteng-Owusu S, Sagoe KW, Mwenda JM, Diamenu SK et al. Rotavirus strain distribution in Ghana pre- and post- rotavirus vaccine introduction. Vaccine 2018, 36(47):7238-7242.
+4.	Portnoy A, Jit M, Ferrari M, Hanson M, Brenzel L, Verguet S. Estimates of case-fatality ratios of measles in low-income and middle-income countries: a systematic review and modelling analysis. Lancet Glob Health 2019, 7(4):e472-e481.
+5.	van Hoek AJ, Melegaro A, Zagheni E, Edmunds WJ, Gay N. Modelling the impact of a combined varicella and zoster vaccination programme on the epidemiology of varicella zoster virus in England. Vaccine 2011, 29(13):2411-2420.
+6.	Weinberger DM, Malley R, Lipsitch M. Serotype replacement in disease after pneumococcal vaccination. Lancet 2011, 378(9807):1962-1973.
+7.	Rheingans R, Atherly D, Anderson J. Distributional impact of rotavirus vaccination in 25 GAVI countries: estimating disparities in benefits and cost-effectiveness. Vaccine 2012, 30 Suppl 1:A15-23.
+8.	Chandir S, Siddiqi DA, Mehmood M, Setayesh H, Siddique M, Mirza A, Soundardjee R, Dharma VK, Shah MT, Abdullah S et al. Impact of COVID-19 pandemic response on uptake of routine immunizations in Sindh, Pakistan: An analysis of provincial electronic immunization registry data. Vaccine 2020, 38(45):7146-7155.
+9.	Hodal K. “Measles vaccination disruptions due to coronavirus put 80 million children at risk.” The Guardian. 29 July 2020 [Online] Accessed: 18 December 2020. Available at: https://www.theguardian.com/global-development/2020/jul/29/measles-vaccination-disruptions-due-to-covid-19-put-80-million-children-at-risk.
+10.	Nelson R. COVID-19 disrupts vaccine delivery. The Lancet Infectious Diseases 2020, 20(5):546.
+11.	Adamu AA, Jalo RI, Habonimana D, Wiysonge CS. COVID-19 and routine childhood immunization in Africa: Leveraging systems thinking and implementation science to improve immunization system performance. Int J Infect Dis 2020, 98:161-165.
+12.	World Health Organization. Guiding principles for immunization activities during the COVID-19 pandemic, Interim guidance. 26 March 2020. [Online] Accessed 24 September 2020. Available at: https://www.who.int/publications/i/item/guiding-principles-for-immunization-activities-during-the-covid-19-pandemic-interim-guidance.
+13.	World Health Organization. WHO COVID-19 Essential Supplies Forecasting Tool (ESFT). 29 April 2020. [Online] Accessed 14 July 2020. Available at: https://www.who.int/docs/default-source/coronaviruse/covid-esft-v2-who-release-updated20200429-1650edt.xlsx?sfvrsn=6b46f7b0_2&download=true 
+14.	Hogan AB, Jewell BL, Sherrard-Smith E, Vesga JF, Watson OJ, Whittaker C, Hamlet A, Smith JA, Winskill P, Verity R et al. Potential impact of the COVID-19 pandemic on HIV, tuberculosis, and malaria in low-income and middle-income countries: a modelling study. The Lancet global health 2020, 8(9):e1132-e1141.
+15.	Jewell BL, Mudimu E, Stover J, ten Brink D, Phillips AN, Smith JA, Martin-Hughes R, Teng Y, Glaubius R, Mahiane SG et al. Potential effects of disruption to HIV programmes in sub-Saharan Africa caused by COVID-19: results from multiple mathematical models. The lancet HIV 2020, 7(9):e629-e640.
+16.	Sherrard-Smith E, Hogan AB, Hamlet A, Watson OJ, Whittaker C, Winskill P, Ali F, Mohammad AB, Uhomoibhi P, Maikore I et al. The potential public health consequences of COVID-19 on malaria in Africa. Nature medicine 2020, 26(9):1411-1416.
+17.	Headey D, Heidkamp R, Osendarp S, Ruel M, Scott N, Black R, Shekar M, Bouis H, Flory A, Haddad L et al. Impacts of COVID-19 on childhood malnutrition and nutrition-related mortality. Lancet 2020, 396(10250):519-521.
+18.	Ahmed T, Roberton T, Vergeer P, Hansen PM, Peters MA, Ofosu AA, Mwansambo C, Nzelu C, Wesseh CS, Smart F et al. Healthcare utilization and maternal and child mortality during the COVID-19 pandemic in 18 low- and middle-income countries: An interrupted time-series analysis with mathematical modeling of administrative data. PLoS Med 2022, 19(8):e1004070.
+19.	Sbarra AN, Mosser JF, Jit M, Ferrari M, Ramshaw RE, O'Connor P, Krause LK, Rogowski ELB, Portnoy A. Estimating national-level measles case-fatality ratios in low-income and middle-income countries: an updated systematic review and modelling study. Lancet Glob Health 2023, 11(4):e516-e524.
+20.	The delta method and its implementation in R [https://www.r-bloggers.com/2019/03/the-delta-method-and-its-implementation-in-r/]
+21.	Liu X. Appendix A: The Delta Method. In: Survival Analysis. edn.: John Wiley & Sons, Ltd; 2012: 405-406.
+22.	Robinson TS. Delta Method. In: Fundamental Theorems for Econometrics. edn.; 2022.
+23.	World Bank. World Development Indicators. 2022. [Online] Accessed 15 July 2022. Available at: https://databank.worldbank.org/source/world-development-indicators 
+24.	World Health Organization. WHO/UNICEF coverage estimates for 1980-2021. Last updated: 8 July 2022.  [Online] Accessed 15 December 2022. Available at: https://www.who.int/data/gho/data/themes/immunization. 2022.
+25.	Headey DD, Ruel MT. Economic shocks predict increases in child wasting prevalence. Nat Commun 2022, 13(1):2157.
+
+
+

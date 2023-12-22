@@ -175,8 +175,8 @@ for (i0 in 1:length(countries)) {
 
 	output <- predictCFR(country = i,
 	                     vaccination_scenario = 'baseline',
-	                     age_start = 0,
-	                     age_end = 4,
+	                     start_age = 0,
+	                     end_age = 4,
 	                     start_year = 2000,
 	                     end_year = 2030,
 	                     community_indicator=1,

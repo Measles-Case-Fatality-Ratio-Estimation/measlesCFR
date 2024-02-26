@@ -12,6 +12,7 @@ Below are the steps for running the package (steps modified from Reed Sorensen's
 2. Open the command line
   - If using Windows: Type “cmd” into the search box
   - If using Mac: Type "terminal" into the search box
+  - Note: If you encounter errors using functionality currently described in the README or vignettes, you may need to update your local instance of the package. Before Step 3, on the command line run: `docker pull measlescasefatalityratio/measles_cfr:latest` and then proceed with Step 3 onwards.
 3. On the command line run: `docker run --rm -p 8787:8787 -e ROOT=TRUE -e PASSWORD=dockpass measlescasefatalityratio/measles_cfr`
   - The initial run may take awhile, but will be quicker on subsequent runs
   - Optionally, you can add the -v tag to give a container access to a location on your
@@ -22,7 +23,7 @@ Below are the steps for running the package (steps modified from Reed Sorensen's
     note that the usual Windows file path will need to be modified slightly. For example,
     C:\Users\myname\data would need to be converted to //C/Users/myname/data.
     - For example: On a Windows machine a user could run `docker run -v //C/Users/<username>/Desktop:/mnt --rm -p 8787:8787 -e ROOT=TRUE -e PASSWORD=dockpass measles_cfr`. Users could then save to their Desktop by referencing mnt. E.g. `save(data, file = "/mnt/dataframe.Rdata` would save the dataframe object to a file called "dataframe.Rdata" on the user's Desktop.
-    - Note: some users may need to clone the package to their local space, and link this cloned folder to dockpass per the previous comments, in order to save and read in files locally.
+    - Note: some users may need to clone the package to their local space, and link this cloned folder to dockpass per the previous comments, in order to save and read in files locally. 
 4. In a browser, go to localhost:8787. Enter user name “rstudio” and password “dockpass”.
   - Step 4 will open a virtual session of Rstudio. Subsequent steps will be completed in Rstudio.
 5. `library(reticulate)`
